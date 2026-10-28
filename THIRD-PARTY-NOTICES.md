@@ -5,11 +5,16 @@ Hindsight itself is MIT-licensed (see `LICENSE`). It ships or uses the following
 ## FFmpeg
 
 The recorder runs FFmpeg as a separate program (`ffmpeg\ffmpeg.exe`, `ffmpeg\ffprobe.exe` and their DLLs);
-Hindsight does not link against it. The bundled build is the Windows "gpl-shared" build from
+Hindsight does not link against it. The bundled build is a pinned month-end Windows "gpl-shared" build from
 [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds), licensed under the **GNU GPL v3**
 (`ffmpeg\LICENSE.txt`). The exact build is named in `ffmpeg\SOURCE.txt`.
 Source code: <https://github.com/FFmpeg/FFmpeg> and the build scripts at <https://github.com/BtbN/FFmpeg-Builds>.
 FFmpeg is a trademark of Fabrice Bellard.
+
+## Fonts
+
+[Sora](https://github.com/sora-xor/sora-font) and [Inter](https://github.com/rsms/inter) are embedded in the app under the
+**SIL Open Font License 1.1** (`src/Hindsight.App/Resources/Fonts/OFL-*.txt`).
 
 ## NAudio
 

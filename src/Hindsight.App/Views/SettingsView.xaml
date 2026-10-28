@@ -4,12 +4,16 @@
              xmlns:c="clr-namespace:Hindsight.App.Controls">
     <UserControl.Resources>
         <c:VisibleWhen x:Key="Visible" />
+        <c:IsValue x:Key="Is" />
+        <c:VisibleIfEquals x:Key="ShowIf" />
+        <c:EqualsConverter x:Key="Equals" />
+
         <Style TargetType="c:SettingRow">
             <Setter Property="Focusable" Value="False" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="c:SettingRow">
-                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="0,14">
+                        <Border BorderBrush="#14FFFFFF" BorderThickness="0,1,0,0" Padding="0,15">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -17,8 +21,8 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
                                     <TextBlock Text="{TemplateBinding Title}" FontSize="13.5" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
-                                    <TextBlock Text="{TemplateBinding Description}" Style="{StaticResource Caption}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"
-                                               Visibility="{Binding Description, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Visible}}" />
+                                    <TextBlock Text="{TemplateBinding Description}" Style="{StaticResource Caption}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0"
+                                               LineHeight="17" Visibility="{Binding Description, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Visible}}" />
                                 </StackPanel>
                                 <ContentPresenter Grid.Column="1" VerticalAlignment="Center" />
                             </Grid>
@@ -27,274 +31,426 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="Section" TargetType="Border" BasedOn="{StaticResource Card}">
-            <Setter Property="Margin" Value="0,0,0,18" />
-            <Setter Property="Padding" Value="22,18,22,8" />
+        <!-- Section menu entry: same look as the main sidebar, a bit smaller -->
+        <Style x:Key="SectionNav" TargetType="RadioButton" BasedOn="{StaticResource NavButton}">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="FontSize" Value="13.5" />
         </Style>
-        <Style x:Key="SectionHeader" TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Horizontal" />
+        <Style x:Key="Panel" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Padding" Value="22,6,22,6" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+        <Style x:Key="BlockTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,16,0,4" />
+        </Style>
+        <Style x:Key="BlockHint" TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="EstimateLabel" TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+            <Setter Property="FontSize" Value="11.5" />
+        </Style>
+        <Style x:Key="EstimateValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,3,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
         <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="Width" Value="270" />
         </Style>
-        <Style x:Key="EstimateLabel" TargetType="TextBlock" BasedOn="{StaticResource Caption}">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Margin" Value="0,0,14,6" />
-        </Style>
-        <Style x:Key="EstimateValue" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-            <Setter Property="Margin" Value="0,0,0,6" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-        </Style>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="34,26,34,40" MaxWidth="980">
-            <TextBlock Text="Ayarlar" Style="{StaticResource PageTitle}" />
-            <TextBlock Text="Değişiklikler hemen kaydedilir; arka plan kaydı gerekirse kendini yeniden başlatır." Style="{StaticResource Muted}" Margin="0,4,0,20" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="236" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <!-- Estimates -->
-            <Border Style="{StaticResource Card}" Margin="0,0,0,18" Background="{StaticResource HeroGradient}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE9D9;" Style="{StaticResource Icon}" Foreground="{StaticResource SuccessBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Bu ayarlarla tahmini kullanım" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Kayıt boyutu" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Column="1" Text="{Binding OutputSizeText}" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="1" Text="Bit hızı" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding BitrateText}" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="2" Text="Bellek (RAM)" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RamEstimateText}" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="3" Text="Disk arabelleği" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DiskEstimateText}" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="4" Text="Klip başına" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ClipSizeText}" Style="{StaticResource EstimateValue}" />
-                    </Grid>
-                </StackPanel>
-            </Border>
+        <!-- Section menu -->
+        <Border Margin="12,12,0,12" Style="{StaticResource Card}" Padding="10,14">
+            <StackPanel>
+                <TextBlock Text="AYARLAR" Style="{StaticResource Overline}" Margin="10,2,0,10" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE714;" Content="Kayıt" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=recording, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="recording" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE767;" Content="Ses" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=audio, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="audio" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE765;" Content="Kısayollar" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=hotkeys, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="hotkeys" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE8B7;" Content="Depolama" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=storage, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="storage" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE945;" Content="Performans" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=performance, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="performance" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE713;" Content="Genel" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=general, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="general" />
+                <RadioButton Style="{StaticResource SectionNav}" Tag="&#xE946;" Content="Sistem ve hakkında" GroupName="sec"
+                             IsChecked="{Binding Section, Converter={StaticResource Equals}, ConverterParameter=about, Mode=OneWay}"
+                             Command="{Binding ShowSectionCommand}" CommandParameter="about" />
+            </StackPanel>
+        </Border>
 
-            <!-- Recording -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" Foreground="{StaticResource AccentBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Klip ve kayıt" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <c:SettingRow Title="Arka plan kaydı" Description="'Sadece oyun açıkken' en az kaynağı kullanır: masaüstündeyken kayıt motoru hiç çalışmaz.">
-                        <ComboBox ItemsSource="{Binding Modes}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Mode}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Klip uzunluğu" Description="Kısayola bastığında geriye doğru kaydedilen süre. Uzatmak RAM kullanımını artırmaz.">
-                        <ComboBox ItemsSource="{Binding ClipLengths}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding ClipSeconds}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Çözünürlük" Description="En fazla 1080p. Ekranın daha büyükse görüntü ekran kartında küçültülür; daha küçükse büyütülmez.">
-                        <ComboBox ItemsSource="{Binding Resolutions}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Resolution}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kare hızı" Description="30 FPS, dosya boyutunu ve kodlama yükünü yaklaşık üçte bir azaltır.">
-                        <ComboBox ItemsSource="{Binding FpsOptions}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Fps}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kalite" Description="Bit hızı çözünürlüğe ve kare hızına göre otomatik ayarlanır.">
-                        <ComboBox ItemsSource="{Binding Qualities}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Quality}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Özel bit hızı" Visibility="{Binding IsCustomBitrate, Converter={StaticResource Visible}}">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="2" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CustomBitrateMbps}" />
-                            <TextBlock Text="{Binding CustomBitrateMbps, StringFormat={}{0} Mbps}" Width="62" Margin="12,0,0,0" VerticalAlignment="Center" />
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="26,28,30,40" MaxWidth="900" HorizontalAlignment="Left">
+                <TextBlock Text="Ayarlar" Style="{StaticResource PageTitle}" />
+                <TextBlock Text="Değişiklikler hemen kaydedilir; arka plan kaydı gerekirse kendini yeniden başlatır." Style="{StaticResource Muted}" Margin="0,4,0,20" />
+
+                <!-- ══ Recording ══ -->
+                <StackPanel Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=recording}">
+                    <!-- Live estimate -->
+                    <Border Style="{StaticResource Card}" Background="{StaticResource HeroGradient}" Margin="0,0,0,16" Padding="22,18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="Kayıt" Style="{StaticResource EstimateLabel}" />
+                                <TextBlock Text="{Binding OutputSizeText}" Style="{StaticResource EstimateValue}" />
+                                <TextBlock Text="{Binding BitrateText}" Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Bellek (RAM)" Style="{StaticResource EstimateLabel}" />
+                                <TextBlock Text="{Binding RamEstimateText}" Style="{StaticResource EstimateValue}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="Disk arabelleği" Style="{StaticResource EstimateLabel}" />
+                                <TextBlock Text="{Binding DiskEstimateText}" Style="{StaticResource EstimateValue}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Klip başına" Style="{StaticResource EstimateLabel}" />
+                                <TextBlock Text="{Binding ClipSizeText}" Style="{StaticResource EstimateValue}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource Panel}" Padding="22,4,22,18">
+                        <StackPanel>
+                            <TextBlock Text="Arka plan kaydı" Style="{StaticResource BlockTitle}" />
+                            <TextBlock Text="Ne zaman son anlar tutulsun?" Style="{StaticResource BlockHint}" />
+                            <UniformGrid Columns="3">
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="mode" Tag="&#xE7FC;" Content="Sadece oyunlarda" Uid="Masaüstünde motor hiç çalışmaz (önerilen)"
+                                             IsChecked="{Binding Mode, Converter={StaticResource Is}, ConverterParameter=GamesOnly}" />
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="mode" Tag="&#xE7F4;" Content="Her zaman" Uid="Masaüstü dahil, sürekli"
+                                             IsChecked="{Binding Mode, Converter={StaticResource Is}, ConverterParameter=Always}" />
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="mode" Tag="&#xE711;" Content="Kapalı" Uid="Sadece elle kayıt" Margin="0"
+                                             IsChecked="{Binding Mode, Converter={StaticResource Is}, ConverterParameter=Off}" />
+                            </UniformGrid>
+
+                            <TextBlock Text="Klip uzunluğu" Style="{StaticResource BlockTitle}" Margin="0,22,0,4" />
+                            <TextBlock Text="Kısayola bastığında geriye doğru kaydedilen süre. Uzatmak RAM kullanımını artırmaz." Style="{StaticResource BlockHint}" />
+                            <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="15 sn" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=15}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="30 sn" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=30}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="45 sn" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=45}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="1 dk" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=60}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="1,5 dk" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=90}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="2 dk" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=120}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="3 dk" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=180}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="len" Content="5 dk" IsChecked="{Binding ClipSeconds, Converter={StaticResource Is}, ConverterParameter=300}" />
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Margin="0,22,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Çözünürlük" Style="{StaticResource BlockTitle}" Margin="0,0,0,4" />
+                                    <TextBlock Text="En fazla 1080p. Büyük ekranlar ekran kartında küçültülür." Style="{StaticResource BlockHint}" />
+                                    <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="res" Content="480p" IsChecked="{Binding Resolution, Converter={StaticResource Is}, ConverterParameter=P480}" />
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="res" Content="540p" IsChecked="{Binding Resolution, Converter={StaticResource Is}, ConverterParameter=P540}" />
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="res" Content="720p" IsChecked="{Binding Resolution, Converter={StaticResource Is}, ConverterParameter=P720}" />
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="res" Content="900p" IsChecked="{Binding Resolution, Converter={StaticResource Is}, ConverterParameter=P900}" />
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="res" Content="1080p" IsChecked="{Binding Resolution, Converter={StaticResource Is}, ConverterParameter=P1080}" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                                    <TextBlock Text="Kare hızı" Style="{StaticResource BlockTitle}" Margin="0,0,0,4" />
+                                    <TextBlock Text="30 FPS daha hafif." Style="{StaticResource BlockHint}" />
+                                    <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="fps" Content="30 FPS" IsChecked="{Binding Fps, Converter={StaticResource Is}, ConverterParameter=30}" />
+                                            <RadioButton Style="{StaticResource Segment}" GroupName="fps" Content="60 FPS" IsChecked="{Binding Fps, Converter={StaticResource Is}, ConverterParameter=60}" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Kalite" Style="{StaticResource BlockTitle}" Margin="0,22,0,4" />
+                            <TextBlock Text="Bit hızı çözünürlüğe ve kare hızına göre otomatik ayarlanır." Style="{StaticResource BlockHint}" />
+                            <StackPanel Orientation="Horizontal">
+                                <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Style="{StaticResource Segment}" GroupName="q" Content="Düşük" IsChecked="{Binding Quality, Converter={StaticResource Is}, ConverterParameter=Low}" />
+                                        <RadioButton Style="{StaticResource Segment}" GroupName="q" Content="Orta" IsChecked="{Binding Quality, Converter={StaticResource Is}, ConverterParameter=Medium}" />
+                                        <RadioButton Style="{StaticResource Segment}" GroupName="q" Content="Yüksek" IsChecked="{Binding Quality, Converter={StaticResource Is}, ConverterParameter=High}" />
+                                        <RadioButton Style="{StaticResource Segment}" GroupName="q" Content="Özel" IsChecked="{Binding Quality, Converter={StaticResource Is}, ConverterParameter=Custom}" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" Margin="18,0,0,0" Visibility="{Binding IsCustomBitrate, Converter={StaticResource Visible}}">
+                                    <Slider Width="200" Minimum="2" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CustomBitrateMbps}" />
+                                    <TextBlock Text="{Binding CustomBitrateMbps, StringFormat={}{0} Mbps}" Width="64" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <TextBlock Text="Video biçimi" Style="{StaticResource BlockTitle}" Margin="0,22,0,4" />
+                            <TextBlock Text="H.264 her yerde oynar (Discord, telefon, tarayıcı). HEVC ve AV1 daha küçük ama her cihazda açılmayabilir." Style="{StaticResource BlockHint}" />
+                            <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="codec" Content="H.264" IsChecked="{Binding Codec, Converter={StaticResource Is}, ConverterParameter=H264}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="codec" Content="HEVC" IsChecked="{Binding Codec, Converter={StaticResource Is}, ConverterParameter=Hevc}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="codec" Content="AV1" IsChecked="{Binding Codec, Converter={StaticResource Is}, ConverterParameter=Av1}" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="Kaydedilecek alan" Style="{StaticResource BlockTitle}" Margin="0,22,0,4" />
+                            <TextBlock Text="Pencere modu bildirimleri ve diğer pencereleri klibe almaz; yakalanamazsa oyunun ekranı kaydedilir." Style="{StaticResource BlockHint}" />
+                            <UniformGrid Columns="3">
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="target" Tag="&#xE7F4;" Content="Oyunun ekranı" Uid="Önerilen"
+                                             IsChecked="{Binding CaptureTarget, Converter={StaticResource Is}, ConverterParameter=GameMonitor}" />
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="target" Tag="&#xE737;" Content="Sadece oyun penceresi" Uid="Bildirimler görünmez"
+                                             IsChecked="{Binding CaptureTarget, Converter={StaticResource Is}, ConverterParameter=GameWindow}" />
+                                <RadioButton Style="{StaticResource OptionCard}" GroupName="target" Tag="&#xE80F;" Content="Ana ekran" Uid="Her zaman birincil ekran" Margin="0"
+                                             IsChecked="{Binding CaptureTarget, Converter={StaticResource Is}, ConverterParameter=PrimaryMonitor}" />
+                            </UniformGrid>
+
+                            <c:SettingRow Title="Kodlayıcı" Description="Otomatik: önce ekran kartı (NVIDIA / AMD / Intel), yoksa Windows, en son işlemci." Margin="0,18,0,0">
+                                <ComboBox ItemsSource="{Binding Encoders}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Encoder}" />
+                            </c:SettingRow>
+                            <c:SettingRow Title="Fare imlecini kaydet">
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding CaptureCursor}" />
+                            </c:SettingRow>
+                            <c:SettingRow Title="Listede olmayan tam ekran oyunları da algıla" Description="Tarayıcılar, video oynatıcılar, ekran görüntüsü araçları ve Discord gibi uygulamalar hariç.">
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding DetectUnknownFullscreen}" />
+                            </c:SettingRow>
                         </StackPanel>
-                    </c:SettingRow>
-                    <c:SettingRow Title="Video biçimi" Description="H.264 her yerde (Discord, telefon, tarayıcı) oynar. HEVC/AV1 daha küçük ama her cihazda açılmayabilir.">
-                        <ComboBox ItemsSource="{Binding Codecs}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Codec}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kodlayıcı" Description="Otomatik: önce ekran kartı (NVIDIA / AMD / Intel), yoksa Windows, en son işlemci. Bulunanlar aşağıda.">
-                        <ComboBox ItemsSource="{Binding Encoders}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Encoder}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kaydedilecek alan" Description="'Sadece oyun penceresi' bildirimleri ve diğer pencereleri klibe almaz.">
-                        <ComboBox ItemsSource="{Binding CaptureTargets}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding CaptureTarget}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Fare imlecini kaydet">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding CaptureCursor}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Listede olmayan tam ekran oyunları da algıla" Description="Tarayıcılar, video oynatıcılar ve Discord gibi uygulamalar hariç tutulur.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding DetectUnknownFullscreen}" />
-                    </c:SettingRow>
-                </StackPanel>
-            </Border>
+                    </Border>
 
-            <!-- Audio -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE767;" Style="{StaticResource Icon}" Foreground="{StaticResource InfoBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Ses" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <c:SettingRow Title="Oyun ve sistem sesini kaydet" Description="Kulaklıkta ne duyuyorsan o kaydedilir. Çıkış cihazını değiştirirsen kendiliğinden geçer.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding RecordSystemAudio}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Sistem sesi seviyesi">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="0" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding SystemVolume}" />
-                            <TextBlock Text="{Binding SystemVolume, StringFormat={}%{0}}" Width="50" Margin="12,0,0,0" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </c:SettingRow>
-                    <c:SettingRow Title="Mikrofonu kaydet" Description="Sesin oyun sesiyle tek iz halinde karıştırılır.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding RecordMicrophone}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Mikrofon" Visibility="{Binding RecordMicrophone, Converter={StaticResource Visible}}">
-                        <ComboBox ItemsSource="{Binding Microphones}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding MicrophoneDeviceId}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Mikrofon seviyesi" Visibility="{Binding RecordMicrophone, Converter={StaticResource Visible}}">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="0" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding MicrophoneVolume}" />
-                            <TextBlock Text="{Binding MicrophoneVolume, StringFormat={}%{0}}" Width="50" Margin="12,0,0,0" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </c:SettingRow>
-                    <c:SettingRow Title="Ses kalitesi">
-                        <ComboBox ItemsSource="{Binding AudioBitrates}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding AudioBitrateKbps}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Ses gecikmesi düzeltmesi" Description="Ses görüntünün gerisinde kalıyorsa eksiye, önünde gidiyorsa artıya çek. Çoğu bilgisayarda 0 doğrudur.">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="-500" Maximum="500" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding AvSyncOffsetMs}" />
-                            <TextBlock Text="{Binding AvSyncOffsetMs, StringFormat={}{0} ms}" Width="62" Margin="12,0,0,0" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </c:SettingRow>
+                    <!-- Test -->
+                    <Border Style="{StaticResource Card}" Padding="20,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Style="{StaticResource IconTile}" Width="40" Height="40" Background="#2234D399" BorderBrush="#4034D399">
+                                <TextBlock Text="&#xE9D9;" Style="{StaticResource Icon}" FontSize="15" Foreground="#6EE7B7" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="14,0,16,0" VerticalAlignment="Center">
+                                <TextBlock Text="Kaydı test et" FontWeight="SemiBold" FontSize="13.5" />
+                                <TextBlock FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                            <Setter Property="Text" Value="{Binding TestResult}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TestResult}" Value="">
+                                                    <Setter Property="Text" Value="Bu ayarlarla 4 saniyelik bir deneme kaydı yapar ve sonucu gösterir." />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TestOk}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Command="{Binding TestRecordingCommand}" IsEnabled="{Binding IsTesting, Converter={x:Static c:InvertBool.Instance}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" FontSize="12" Foreground="White" Margin="0,0,8,0" />
+                                    <TextBlock Text="Testi başlat" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
                 </StackPanel>
-            </Border>
 
-            <!-- Hotkeys -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE765;" Style="{StaticResource Icon}" Foreground="{StaticResource Accent2Brush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Kısayollar" Style="{StaticResource SectionTitle}" />
+                <!-- ══ Audio ══ -->
+                <Border Style="{StaticResource Panel}" Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=audio}">
+                    <StackPanel>
+                        <c:SettingRow Title="Oyun ve sistem sesini kaydet" Description="Kulaklıkta ne duyuyorsan o kaydedilir. Çıkış cihazını değiştirirsen kayıt da geçer." BorderThickness="0">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding RecordSystemAudio}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Sistem sesi seviyesi">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="0" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding SystemVolume}" />
+                                <TextBlock Text="{Binding SystemVolume, StringFormat={}%{0}}" Width="52" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Mikrofonu kaydet" Description="Sesin oyun sesiyle tek iz halinde karıştırılır.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding RecordMicrophone}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Mikrofon" Visibility="{Binding RecordMicrophone, Converter={StaticResource Visible}}">
+                            <ComboBox ItemsSource="{Binding Microphones}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding MicrophoneDeviceId}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Mikrofon seviyesi" Visibility="{Binding RecordMicrophone, Converter={StaticResource Visible}}">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="0" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding MicrophoneVolume}" />
+                                <TextBlock Text="{Binding MicrophoneVolume, StringFormat={}%{0}}" Width="52" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Ses kalitesi">
+                            <Border Style="{StaticResource SegmentBar}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="ab" Content="96" IsChecked="{Binding AudioBitrateKbps, Converter={StaticResource Is}, ConverterParameter=96}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="ab" Content="128" IsChecked="{Binding AudioBitrateKbps, Converter={StaticResource Is}, ConverterParameter=128}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="ab" Content="160" IsChecked="{Binding AudioBitrateKbps, Converter={StaticResource Is}, ConverterParameter=160}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="ab" Content="192" IsChecked="{Binding AudioBitrateKbps, Converter={StaticResource Is}, ConverterParameter=192}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="ab" Content="256 kbps" IsChecked="{Binding AudioBitrateKbps, Converter={StaticResource Is}, ConverterParameter=256}" />
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Ses gecikmesi düzeltmesi" Description="Ses görüntünün gerisinde kalıyorsa eksiye, önünde gidiyorsa artıya çek. Çoğu bilgisayarda 0 doğrudur.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="-500" Maximum="500" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding AvSyncOffsetMs}" />
+                                <TextBlock Text="{Binding AvSyncOffsetMs, StringFormat={}{0} ms}" Width="64" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </c:SettingRow>
                     </StackPanel>
-                    <c:SettingRow Title="Klip kaydet" Description="Son anları kaydeder. Oyun içindeyken de çalışır.">
-                        <c:HotkeyBox Hotkey="{Binding SaveClipHotkey}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kayıt başlat / durdur" Description="Süre sınırı olmayan normal kayıt; başlangıçtan önceki 2 saniye de dahil.">
-                        <c:HotkeyBox Hotkey="{Binding ToggleRecordingHotkey}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Ekran görüntüsü" Description="Tam çözünürlükte PNG, oyunun klasörüne.">
-                        <c:HotkeyBox Hotkey="{Binding ScreenshotHotkey}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Arka plan kaydını aç / kapat" Description="Örneğin yayında veya özel bir anda kaydı geçici olarak durdurmak için.">
-                        <c:HotkeyBox Hotkey="{Binding ToggleBufferHotkey}" />
-                    </c:SettingRow>
-                </StackPanel>
-            </Border>
+                </Border>
 
-            <!-- Storage -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE8B7;" Style="{StaticResource Icon}" Foreground="{StaticResource WarningBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Depolama" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <c:SettingRow Title="Klip klasörü" Description="{Binding ClipsFolder}">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Aç" Command="{Binding OpenClipsFolderCommand}" />
-                            <Button Content="Değiştir" Margin="8,0,0,0" Command="{Binding BrowseClipsFolderCommand}" />
+                <!-- ══ Hotkeys ══ -->
+                <StackPanel Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=hotkeys}">
+                    <Border Style="{StaticResource Panel}">
+                        <StackPanel>
+                            <c:SettingRow Title="Klip kaydet" Description="Son anları kaydeder. Oyun içindeyken de çalışır.">
+                                <c:HotkeyBox Hotkey="{Binding SaveClipHotkey}" />
+                            </c:SettingRow>
+                            <c:SettingRow Title="Kayıt başlat / durdur" Description="Süre sınırı olmayan normal kayıt; başlangıçtan önceki 2 saniye de dahil.">
+                                <c:HotkeyBox Hotkey="{Binding ToggleRecordingHotkey}" />
+                            </c:SettingRow>
+                            <c:SettingRow Title="Ekran görüntüsü" Description="Tam çözünürlükte PNG, oyunun klasörüne.">
+                                <c:HotkeyBox Hotkey="{Binding ScreenshotHotkey}" />
+                            </c:SettingRow>
+                            <c:SettingRow Title="Arka plan kaydını aç / kapat" Description="Örneğin yayında kaydı geçici olarak durdurmak için.">
+                                <c:HotkeyBox Hotkey="{Binding ToggleBufferHotkey}" />
+                            </c:SettingRow>
                         </StackPanel>
-                    </c:SettingRow>
-                    <c:SettingRow Title="Geçici arabellek klasörü" Description="{Binding BufferFolder}">
+                    </Border>
+                    <Border Style="{StaticResource Card}" Background="#14FBBF24" BorderBrush="#40FBBF24" Padding="16,12">
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="Varsayılan" Command="{Binding ResetBufferFolderCommand}" />
-                            <Button Content="Değiştir" Margin="8,0,0,0" Command="{Binding BrowseBufferFolderCommand}" />
+                            <TextBlock Text="&#xE946;" Style="{StaticResource Icon}" FontSize="14" Foreground="{StaticResource WarningBrush}" Margin="0,0,12,0" />
+                            <TextBlock Style="{StaticResource Muted}" FontSize="12.5" MaxWidth="760"
+                                       Text="İpucu: Ctrl içeren kısayollardan kaçın — birçok oyunda Ctrl eğilme tuşudur, oyun da tuşa tepki verir. Alt + F tuşları güvenlidir; Alt+F9/F10 NVIDIA uygulamasına ayrılmıştır." />
                         </StackPanel>
-                    </c:SettingRow>
-                    <c:SettingRow Title="Depolama sınırı" Description="Açıkken klasör sınırı aşınca en eski klipler kalıcı olarak silinir. Favoriler asla silinmez.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StorageLimitEnabled}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Sınır" Visibility="{Binding StorageLimitEnabled, Converter={StaticResource Visible}}">
+                    </Border>
+                </StackPanel>
+
+                <!-- ══ Storage ══ -->
+                <Border Style="{StaticResource Panel}" Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=storage}">
+                    <StackPanel>
+                        <c:SettingRow Title="Klip klasörü" Description="{Binding ClipsFolder}">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Aç" Command="{Binding OpenClipsFolderCommand}" />
+                                <Button Content="Değiştir" Margin="8,0,0,0" Command="{Binding BrowseClipsFolderCommand}" />
+                            </StackPanel>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Geçici arabellek klasörü" Description="{Binding BufferFolder}">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Varsayılan" Command="{Binding ResetBufferFolderCommand}" />
+                                <Button Content="Değiştir" Margin="8,0,0,0" Command="{Binding BrowseBufferFolderCommand}" />
+                            </StackPanel>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Depolama sınırı" Description="Açıkken klasör sınırı aşınca en eski klipler kalıcı olarak silinir. Favoriler asla silinmez.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StorageLimitEnabled}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Sınır" Visibility="{Binding StorageLimitEnabled, Converter={StaticResource Visible}}">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="5" Maximum="500" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding StorageLimitGb}" />
+                                <TextBlock Text="{Binding StorageLimitGb, StringFormat={}{0} GB}" Width="64" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══ Performance ══ -->
+                <Border Style="{StaticResource Panel}" Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=performance}">
+                    <StackPanel>
+                        <c:SettingRow Title="Kayıt önceliği" Description="Oyun işlemciyi tamamen kullanıyorsa 'Düşük' oyuna yer açar; klipte takılma görürsen 'Yüksek' dene.">
+                            <Border Style="{StaticResource SegmentBar}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="prio" Content="Düşük" IsChecked="{Binding Priority, Converter={StaticResource Is}, ConverterParameter=Low}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="prio" Content="Normal" IsChecked="{Binding Priority, Converter={StaticResource Is}, ConverterParameter=Normal}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="prio" Content="Yüksek" IsChecked="{Binding Priority, Converter={StaticResource Is}, ConverterParameter=High}" />
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <c:SettingRow Title="Tepsideyken belleği boşalt" Description="Pencere kapanınca arayüz tamamen kaldırılır ve kullanılmayan bellek Windows'a geri verilir.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding TrimMemoryInTray}" />
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══ General ══ -->
+                <Border Style="{StaticResource Panel}" Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=general}">
+                    <StackPanel>
+                        <c:SettingRow Title="Windows ile başlat">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StartWithWindows}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Tepside küçültülmüş başlat" Description="Windows ile açılınca pencere gösterilmez.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StartMinimized}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Kapat düğmesi tepsiye küçültür" Description="Kapalıyken pencereyi kapatmak Hindsight'tan çıkar.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding CloseToTray}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Klip kaydedilince bildirim göster" Description="Oyunun ekranının köşesinde kısa bir kart; odak çalmaz, tıklamaları engellemez.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowSaveToast}" />
+                        </c:SettingRow>
+                        <c:SettingRow Title="Klip kaydedilince ses çal" Description="Tam ekran oyunlarda bildirim görünmeyebilir; ses her zaman duyulur.">
+                            <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding PlaySaveSound}" />
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══ About ══ -->
+                <Border Style="{StaticResource Panel}" Padding="22,18" Visibility="{Binding Section, Converter={StaticResource ShowIf}, ConverterParameter=about}">
+                    <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="5" Maximum="500" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding StorageLimitGb}" />
-                            <TextBlock Text="{Binding StorageLimitGb, StringFormat={}{0} GB}" Width="62" Margin="12,0,0,0" VerticalAlignment="Center" />
+                            <Image Source="/Resources/logo.png" Width="52" Height="52" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Hindsight" Style="{StaticResource Display}" FontSize="20" />
+                                <TextBlock x:Name="VersionText" Style="{StaticResource Caption}" FontSize="12" Margin="0,2,0,0" />
+                            </StackPanel>
                         </StackPanel>
-                    </c:SettingRow>
-                </StackPanel>
-            </Border>
-
-            <!-- Performance -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE945;" Style="{StaticResource Icon}" Foreground="{StaticResource SuccessBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Performans" Style="{StaticResource SectionTitle}" />
+                        <Grid Margin="0,18,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition /><RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Kayıt motoru" Style="{StaticResource EstimateLabel}" Margin="0,4,0,8" />
+                            <TextBlock Grid.Column="1" Text="{Binding FfmpegText}" Style="{StaticResource EstimateValue}" Margin="0,3,0,8" FontWeight="Medium" />
+                            <TextBlock Grid.Row="1" Text="Kodlayıcılar" Style="{StaticResource EstimateLabel}" Margin="0,4,0,0" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EncoderInfoText}" Style="{StaticResource EstimateValue}" Margin="0,3,0,0" FontWeight="Medium" />
+                        </Grid>
+                        <WrapPanel Margin="0,18,0,0">
+                            <Button Content="Kodlayıcıları yeniden algıla" Margin="0,0,8,8" Command="{Binding ReprobeCommand}" />
+                            <Button Content="Günlük dosyasını aç" Margin="0,0,8,8" Command="{Binding OpenLogCommand}" />
+                            <Button Content="Varsayılanlara dön" Margin="0,0,8,8" Command="{Binding ResetDefaultsCommand}" />
+                            <Button Content="Web sitesi" Style="{StaticResource GhostButton}" Margin="0,0,8,8" Click="OnWebsite" />
+                            <Button Content="GitHub" Style="{StaticResource GhostButton}" Margin="0,0,8,8" Click="OnGitHub" />
+                        </WrapPanel>
                     </StackPanel>
-                    <c:SettingRow Title="Kayıt önceliği" Description="Oyun işlemciyi tamamen kullanıyorsa 'Düşük' oyuna yer açar; klipte takılma görürsen 'Yüksek' dene.">
-                        <ComboBox ItemsSource="{Binding Priorities}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Priority}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Tepsideyken belleği boşalt" Description="Pencere kapanınca arayüz tamamen kaldırılır ve kullanılmayan bellek Windows'a geri verilir.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding TrimMemoryInTray}" />
-                    </c:SettingRow>
-                </StackPanel>
-            </Border>
-
-            <!-- General -->
-            <Border Style="{StaticResource Section}">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE713;" Style="{StaticResource Icon}" Foreground="{StaticResource MutedBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Genel" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <c:SettingRow Title="Windows ile başlat">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StartWithWindows}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Tepside küçültülmüş başlat" Description="Windows ile açılınca pencere gösterilmez.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding StartMinimized}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Kapat düğmesi tepsiye küçültür" Description="Kapalıyken pencereyi kapatmak Hindsight'tan çıkar.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding CloseToTray}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Klip kaydedilince bildirim göster" Description="Köşede kısa bir kart; odak çalmaz, tıklamaları engellemez.">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowSaveToast}" />
-                    </c:SettingRow>
-                    <c:SettingRow Title="Klip kaydedilince ses çal">
-                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding PlaySaveSound}" />
-                    </c:SettingRow>
-                </StackPanel>
-            </Border>
-
-            <!-- About -->
-            <Border Style="{StaticResource Section}" Padding="22,18">
-                <StackPanel>
-                    <StackPanel Style="{StaticResource SectionHeader}">
-                        <TextBlock Text="&#xE946;" Style="{StaticResource Icon}" Foreground="{StaticResource MutedBrush}" Margin="0,0,10,0" />
-                        <TextBlock Text="Sistem ve hakkında" Style="{StaticResource SectionTitle}" />
-                    </StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition /><RowDefinition /><RowDefinition />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Sürüm" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Column="1" x:Name="VersionText" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="1" Text="Kayıt motoru" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FfmpegText}" Style="{StaticResource EstimateValue}" />
-                        <TextBlock Grid.Row="2" Text="Kodlayıcılar" Style="{StaticResource EstimateLabel}" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding EncoderInfoText}" Style="{StaticResource EstimateValue}" />
-                    </Grid>
-                    <WrapPanel Margin="0,10,0,0">
-                        <Button Content="Kodlayıcıları yeniden algıla" Margin="0,0,8,8" Command="{Binding ReprobeCommand}" />
-                        <Button Content="Günlük dosyasını aç" Margin="0,0,8,8" Command="{Binding OpenLogCommand}" />
-                        <Button Content="Varsayılanlara dön" Margin="0,0,8,8" Command="{Binding ResetDefaultsCommand}" />
-                        <Button Content="Web sitesi" Style="{StaticResource GhostButton}" Margin="0,0,8,8" Click="OnWebsite" />
-                        <Button Content="GitHub" Style="{StaticResource GhostButton}" Margin="0,0,8,8" Click="OnGitHub" />
-                    </WrapPanel>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

@@ -130,7 +130,8 @@ public sealed partial class GamesViewModel : ObservableObject, IDisposable
         foreach (var group in visible.GroupBy(c => c.Game.Source).OrderBy(g => g.Key))
         {
             var items = group.OrderByDescending(c => c.IsRunning).ThenBy(c => c.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
-            Rows.Add(new HeaderRow(GameEntry.SourceName(group.Key), $"{items.Count} oyun"));
+            var (badge, color) = PlatformBadge(group.Key);
+            Rows.Add(new HeaderRow(GameEntry.SourceName(group.Key), $"{items.Count} oyun", badge, color));
             foreach (var chunk in items.Chunk(_columns))
             {
                 Rows.Add(new GameRow(chunk));
@@ -141,6 +142,21 @@ public sealed partial class GamesViewModel : ObservableObject, IDisposable
         Summary = $"{_cards.Count - hidden} oyun · {visible.Select(c => c.Game.Source).Distinct().Count()} platform" +
                   (hidden > 0 ? $" · {hidden} gizli" : string.Empty);
     }
+
+    private static (string Badge, string Color) PlatformBadge(GameSource source) => source switch
+    {
+        GameSource.Steam => ("S", "#1A6FD8"),
+        GameSource.Epic => ("E", "#3A3A44"),
+        GameSource.Gog => ("G", "#7B3FD1"),
+        GameSource.Ubisoft => ("U", "#1E5BD6"),
+        GameSource.Ea => ("EA", "#E0303A"),
+        GameSource.BattleNet => ("B", "#1497E0"),
+        GameSource.Riot => ("R", "#D8323A"),
+        GameSource.Rockstar => ("R", "#E8A317"),
+        GameSource.Xbox => ("X", "#1F8A3A"),
+        GameSource.Detected => ("⚡", "#C2410C"),
+        _ => ("+", "#4B4B5A"),
+    };
 
     [RelayCommand]
     private async Task RescanAsync()

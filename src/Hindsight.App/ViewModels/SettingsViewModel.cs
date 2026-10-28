@@ -222,6 +222,45 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool IsProbing { get; set; }
 
+    /// <summary>Which settings section is shown (recording, audio, hotkeys, storage, performance, general, about).</summary>
+    [ObservableProperty]
+    public partial string Section { get; set; } = "recording";
+
+    [ObservableProperty]
+    public partial bool IsTesting { get; set; }
+
+    [ObservableProperty]
+    public partial string TestResult { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool TestOk { get; set; }
+
+    [RelayCommand]
+    private void ShowSection(string section) => Section = section;
+
+    /// <summary>Records 4 s with the current settings and reports which encoder/path worked.</summary>
+    [RelayCommand]
+    private async Task TestRecordingAsync()
+    {
+        if (IsTesting)
+        {
+            return;
+        }
+
+        IsTesting = true;
+        TestResult = "Test ediliyor… (yaklaşık 6 saniye)";
+        try
+        {
+            var (ok, message) = await Task.Run(() => _services.Capture.TestRecordingAsync());
+            TestOk = ok;
+            TestResult = message;
+        }
+        finally
+        {
+            IsTesting = false;
+        }
+    }
+
     private void RefreshDerived()
     {
         var s = S;
@@ -238,11 +277,11 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
         RamEstimateText = encoder is null
             ? "Kodlayıcı henüz algılanmadı"
             : encoder.IsHardware
-                ? "≈ 100–150 MB · görüntü ekran kartında işlenir, RAM'e inmez"
+                ? "≈ 100–200 MB · ekran kartında"
                 : encoder.Vendor == EncoderVendor.MediaFoundation
                     ? "≈ 200–260 MB · Windows kodlayıcısı"
-                    : "≈ 250–350 MB · işlemciyle kodlama (daha ağır)";
-        DiskEstimateText = $"≈ {VideoMath.BufferDiskMegabytes(kbps, audio, s.ClipSeconds):0} MB · arabellek diskte döner, RAM'de büyümez";
+                    : "≈ 250–350 MB · işlemciyle (ağır)";
+        DiskEstimateText = $"≈ {VideoMath.BufferDiskMegabytes(kbps, audio, s.ClipSeconds):0} MB · RAM'de değil";
         ClipSizeText = $"≈ {VideoMath.Megabytes(kbps + audio, s.ClipSeconds):0} MB / {s.ClipSeconds} sn klip";
         EncoderInfoText = caps is null
             ? "Kontrol ediliyor…"

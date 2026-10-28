@@ -188,6 +188,25 @@ public sealed class GameLibrary
 
     public void SetHidden(string id, bool hidden) => Mutate(id, g => g.Hidden = hidden);
 
+    public void RemoveWhere(Func<GameEntry, bool> predicate)
+    {
+        int removed;
+        lock (_gate)
+        {
+            removed = _games.RemoveAll(g => predicate(g));
+            if (removed > 0)
+            {
+                RebuildIndex();
+            }
+        }
+
+        if (removed > 0)
+        {
+            Save();
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
     public void Remove(string id)
     {
         lock (_gate)

@@ -58,3 +58,35 @@ public sealed class InvertBool : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => value is not true;
 }
+
+/// <summary>
+/// Binds a RadioButton to one value of an enum/int property: IsChecked = (value == parameter); checking it writes
+/// the parameter back, converted to the property's type. Usage: IsChecked="{Binding Fps, Converter={StaticResource Is}, ConverterParameter=60}".
+/// </summary>
+public sealed class IsValue : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        string.Equals(value?.ToString(), parameter?.ToString(), StringComparison.OrdinalIgnoreCase);
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not true || parameter is null)
+        {
+            return Binding.DoNothing;
+        }
+
+        var type = Nullable.GetUnderlyingType(targetType) ?? targetType;
+        return type.IsEnum
+            ? Enum.Parse(type, parameter.ToString()!, ignoreCase: true)
+            : System.Convert.ChangeType(parameter, type, CultureInfo.InvariantCulture);
+    }
+}
+
+/// <summary>Visible when value == parameter (used for settings sections).</summary>
+public sealed class VisibleIfEquals : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        string.Equals(value?.ToString(), parameter?.ToString(), StringComparison.Ordinal) ? Visibility.Visible : Visibility.Collapsed;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}

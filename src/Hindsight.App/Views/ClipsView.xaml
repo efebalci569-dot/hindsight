@@ -8,9 +8,13 @@
         <c:VisibleWhen x:Key="Visible" />
 
         <DataTemplate DataType="{x:Type vm:HeaderRow}">
-            <StackPanel Orientation="Horizontal" Margin="4,20,0,12">
-                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitle}" FontSize="17" />
-                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Caption}" FontSize="12" VerticalAlignment="Bottom" Margin="12,0,0,2" />
+            <StackPanel Orientation="Horizontal" Margin="4,22,0,13">
+                <Border Width="28" Height="28" CornerRadius="8" Background="{StaticResource AccentGlowGradient}" BorderBrush="#40FF7A5A" BorderThickness="1">
+                    <TextBlock Text="{Binding Badge}" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="11" Foreground="#FFB4A0"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitle}" FontSize="17.5" Margin="11,0,0,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Caption}" FontSize="12" VerticalAlignment="Center" Margin="12,1,0,0" />
             </StackPanel>
         </DataTemplate>
 
@@ -45,61 +49,72 @@
         </ContextMenu>
 
         <DataTemplate x:Key="ClipCard" DataType="{x:Type vm:ClipCardViewModel}">
-            <Border Width="268" Margin="0,0,16,18" Background="Transparent" Cursor="Hand"
-                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    ContextMenu="{StaticResource ClipMenu}" ToolTip="{Binding Title}">
-                <Border.InputBindings>
+            <Grid x:Name="Card" Width="272" Height="172" Margin="0,0,16,18" Background="Transparent" Cursor="Hand" RenderTransformOrigin="0.5,0.5"
+                  Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  ContextMenu="{StaticResource ClipMenu}" ToolTip="{Binding Title}">
+                <Grid.InputBindings>
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                   CommandParameter="{Binding}" />
-                </Border.InputBindings>
-                <StackPanel>
-                    <Grid Height="151" x:Name="Thumb">
-                        <Border CornerRadius="11" Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                            <TextBlock Text="{Binding KindGlyph}" Style="{StaticResource Icon}" FontSize="24" Foreground="{StaticResource DimBrush}" />
-                        </Border>
-                        <Border CornerRadius="11">
-                            <Border.Background>
-                                <ImageBrush ImageSource="{Binding Thumbnail}" Stretch="UniformToFill" />
-                            </Border.Background>
-                        </Border>
-                        <Border x:Name="Hover" CornerRadius="11" Background="#66000000" Opacity="0">
-                            <Border Width="46" Height="46" CornerRadius="23" Background="{StaticResource AccentGradient}">
-                                <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" Foreground="White" FontSize="16" Margin="3,0,0,0" />
-                            </Border>
-                        </Border>
-                        <Border Background="#CC0B0B10" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
-                            <TextBlock Text="{Binding KindGlyph}" Style="{StaticResource Icon}" FontSize="11" />
-                        </Border>
-                        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="6" Width="30" Height="30" Padding="0"
-                                Background="#990B0B10" BorderThickness="0" FontFamily="{StaticResource IconFont}" FontSize="13"
-                                Command="{Binding DataContext.FavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
-                                ToolTip="Favori">
-                            <TextBlock FontFamily="{StaticResource IconFont}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="&#xE734;" />
-                                        <Setter Property="Foreground" Value="#CCFFFFFF" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsFavorite}" Value="True">
-                                                <Setter Property="Text" Value="&#xE735;" />
-                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Button>
-                        <Border Background="#CC0B0B10" CornerRadius="6" Padding="7,2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8">
-                            <TextBlock Text="{Binding Badge}" FontSize="11.5" FontWeight="SemiBold" />
-                        </Border>
-                    </Grid>
-                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" Margin="2,9,0,0" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Text="{Binding Details}" Style="{StaticResource Caption}" Margin="2,2,0,0" TextTrimming="CharacterEllipsis" />
+                </Grid.InputBindings>
+                <Border CornerRadius="15" Background="{StaticResource Surface2Brush}">
+                    <TextBlock Text="{Binding KindGlyph}" Style="{StaticResource Icon}" FontSize="24" Foreground="{StaticResource DimBrush}" Margin="0,0,0,30" />
+                </Border>
+                <Border CornerRadius="15">
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding Thumbnail}" Stretch="UniformToFill" />
+                    </Border.Background>
+                </Border>
+                <Border CornerRadius="15" Background="{StaticResource ShadeGradient}" />
+                <Border x:Name="Edge" CornerRadius="15" BorderBrush="#24FFFFFF" BorderThickness="1" />
+
+                <Border x:Name="Play" Width="48" Height="48" CornerRadius="24" Background="{StaticResource AccentGradient}" Opacity="0" Margin="0,0,0,28">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4D5E" BlurRadius="20" ShadowDepth="0" Opacity="0.6" />
+                    </Border.Effect>
+                    <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" Foreground="White" FontSize="16" Margin="3,0,0,0" />
+                </Border>
+
+                <Border Background="#CC08080C" CornerRadius="7" Padding="6,3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding KindGlyph}" Style="{StaticResource Icon}" FontSize="10.5" />
+                        <TextBlock Text="{Binding Badge}" FontSize="11" FontWeight="SemiBold" Margin="6,0,1,0" />
+                    </StackPanel>
+                </Border>
+                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="7" Width="30" Height="30" Padding="0"
+                        Background="#99080810" BorderThickness="0"
+                        Command="{Binding DataContext.FavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                        ToolTip="Favori">
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+                                <Setter Property="FontSize" Value="13" />
+                                <Setter Property="Text" Value="&#xE734;" />
+                                <Setter Property="Foreground" Value="#CCFFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                        <Setter Property="Text" Value="&#xE735;" />
+                                        <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+                <StackPanel VerticalAlignment="Bottom" Margin="13,0,13,11">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" Foreground="White" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Details}" FontSize="11.5" Foreground="#B3FFFFFF" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
                 </StackPanel>
-            </Border>
+            </Grid>
             <DataTemplate.Triggers>
-                <Trigger SourceName="Thumb" Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Hover" Property="Opacity" Value="1" />
+                <Trigger SourceName="Card" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Play" Property="Opacity" Value="1" />
+                    <Setter TargetName="Edge" Property="BorderBrush" Value="#B3FF6A5A" />
+                    <Setter TargetName="Card" Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                        </Setter.Value>
+                    </Setter>
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -120,7 +135,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border x:Name="Bd" Background="Transparent" CornerRadius="9" Padding="12,8" Margin="0,1">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="11" Padding="8,7" Margin="0,1">
                             <ContentPresenter />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -128,7 +143,7 @@
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface2Brush}" />
+                                <Setter TargetName="Bd" Property="Background" Value="#16FFFFFF" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -139,14 +154,14 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="232" />
+            <ColumnDefinition Width="244" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- Game filter -->
-        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
-            <DockPanel Margin="12,26,12,12">
-                <TextBlock DockPanel.Dock="Top" Text="OYUNA GÖRE" Style="{StaticResource Caption}" FontWeight="SemiBold" Margin="12,6,0,10" />
+        <Border Margin="12,12,0,12" Style="{StaticResource Card}" Padding="10,14">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="OYUNA GÖRE" Style="{StaticResource Overline}" Margin="10,2,0,10" />
                 <ListBox ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter}" Background="Transparent" BorderThickness="0"
                          ItemContainerStyle="{StaticResource FilterItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          VirtualizingPanel.IsVirtualizing="True">
@@ -158,10 +173,20 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource MutedBrush}" Width="18" />
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource TextBrush}" FontSize="13" Margin="10,0,8,0"
+                                <Border Width="30" Height="30" CornerRadius="9" Background="{StaticResource Surface3Brush}">
+                                    <Grid>
+                                        <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource MutedBrush}"
+                                                   Visibility="{Binding HasInitials, Converter={StaticResource Visible}, ConverterParameter=invert}" />
+                                        <TextBlock Text="{Binding Initials}" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="11" Foreground="#FFB4A0"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Visibility="{Binding HasInitials, Converter={StaticResource Visible}}" />
+                                    </Grid>
+                                </Border>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{StaticResource TextBrush}" FontSize="13" FontWeight="Medium" Margin="11,0,8,0"
                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="2" Text="{Binding Count}" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                                <Border Grid.Column="2" Background="#14FFFFFF" CornerRadius="8" Padding="7,1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Count}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" />
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -169,36 +194,42 @@
             </DockPanel>
         </Border>
 
-        <DockPanel Grid.Column="1" Margin="26,26,10,0">
+        <DockPanel Grid.Column="1" Margin="26,28,10,0">
             <Grid DockPanel.Dock="Top" Margin="4,0,20,4">
                 <StackPanel>
                     <TextBlock Text="{Binding Title}" Style="{StaticResource PageTitle}" TextTrimming="CharacterEllipsis" MaxWidth="420" HorizontalAlignment="Left" />
                     <TextBlock Text="{Binding Summary}" Style="{StaticResource Muted}" Margin="0,4,0,0" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Grid Width="190">
-                        <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Padding="32,7,10,7" />
+                    <Grid Width="200">
+                        <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Padding="34,8,10,8" />
                         <TextBlock Text="&#xE721;" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource DimBrush}" HorizontalAlignment="Left"
-                                   Margin="11,0,0,0" IsHitTestVisible="False" />
+                                   Margin="12,0,0,0" IsHitTestVisible="False" />
                     </Grid>
                     <ComboBox ItemsSource="{Binding SortOptions}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Sort}"
-                              MinWidth="120" Margin="10,0,0,0" />
-                    <Button Style="{StaticResource IconButton}" Content="&#xE838;" Margin="6,0,0,0" Command="{Binding OpenFolderCommand}" ToolTip="Klasörü aç" />
+                              MinWidth="124" Margin="10,0,0,0" />
+                    <Button Style="{StaticResource IconButton}" Content="&#xE838;" Margin="8,0,0,0" Command="{Binding OpenFolderCommand}" ToolTip="Klasörü aç" />
                     <Button Style="{StaticResource IconButton}" Content="&#xE72C;" Command="{Binding RefreshCommand}" ToolTip="Yenile" />
                 </StackPanel>
             </Grid>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,12,0,0">
-                <RadioButton Style="{StaticResource PillToggle}" Content="Tümü" GroupName="kind" IsChecked="{Binding KindAll}" />
-                <RadioButton Style="{StaticResource PillToggle}" Content="Videolar" GroupName="kind" IsChecked="{Binding KindVideos}" />
-                <RadioButton Style="{StaticResource PillToggle}" Content="Ekran görüntüleri" GroupName="kind" IsChecked="{Binding KindScreenshots}" />
-                <TextBlock Text="Çift tıkla: oynat · Sağ tık: kopyala, küçült, GIF, sil" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="10,0,0,0" />
-            </StackPanel>
+            <Grid DockPanel.Dock="Top" Margin="4,14,20,0">
+                <Border Style="{StaticResource SegmentBar}" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Style="{StaticResource Segment}" Content="Tümü" GroupName="kind" IsChecked="{Binding KindAll}" />
+                        <RadioButton Style="{StaticResource Segment}" Content="Videolar" GroupName="kind" IsChecked="{Binding KindVideos}" />
+                        <RadioButton Style="{StaticResource Segment}" Content="Ekran görüntüleri" GroupName="kind" IsChecked="{Binding KindScreenshots}" />
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="Çift tıkla: oynat · Sağ tık: kopyala, küçült, GIF, sil" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            </Grid>
 
-            <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="4,24,20,0" Padding="30"
+            <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="4,24,20,0" Padding="32"
                     Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}">
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="30" Foreground="{StaticResource DimBrush}" />
-                    <TextBlock Text="Burada henüz bir şey yok" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,10,0,0" />
+                    <Border Style="{StaticResource IconTile}" Width="54" Height="54" CornerRadius="16">
+                        <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="22" Foreground="#FF8A70" />
+                    </Border>
+                    <TextBlock Text="Burada henüz bir şey yok" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,14,0,0" />
                     <TextBlock Style="{StaticResource Muted}" TextAlignment="Center" Margin="0,6,0,0" MaxWidth="440"
                                Text="Oyun oynarken klip kaydetme kısayoluna bastığında klipler burada, oyun oyun ayrılmış olarak görünür." />
                 </StackPanel>

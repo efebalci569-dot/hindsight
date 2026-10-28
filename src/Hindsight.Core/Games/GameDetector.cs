@@ -39,8 +39,12 @@ public sealed class GameSession : IDisposable
 /// </summary>
 public sealed class GameDetector : IDisposable
 {
-    private static readonly HashSet<string> NotGames = new(StringComparer.OrdinalIgnoreCase)
+    /// <summary>Full-screen apps that are never games: browsers, players, launchers, overlays, screenshot tools.</summary>
+    public static readonly HashSet<string> NotGames = new(StringComparer.OrdinalIgnoreCase)
     {
+        "Lightshot", "ShareX", "Greenshot", "Snagit32", "SnagitEditor", "SnippingTool", "ScreenClippingHost", "ScreenSketch",
+        "Gyazo", "GyazoReplay", "Flameshot", "PicPick", "obs-browser-page", "msedgewebview2", "CefSharp.BrowserSubprocess",
+        "LockApp", "LogonUI", "consent", "mmc", "WinStore.App", "Widgets", "PowerToys", "PowerToys.PowerLauncher", "rundll32",
         "explorer", "chrome", "msedge", "firefox", "opera", "opera_gx", "brave", "vivaldi", "iexplore", "arc",
         "vlc", "mpc-hc64", "mpc-hc", "mpc-be64", "potplayer", "potplayermini64", "wmplayer", "Video.UI", "Microsoft.Media.Player",
         "ApplicationFrameHost", "TextInputHost", "LockApp", "SearchHost", "StartMenuExperienceHost", "ShellExperienceHost",
@@ -53,6 +57,7 @@ public sealed class GameDetector : IDisposable
     private readonly GameLibrary _library;
     private readonly SettingsStore _settings;
     private readonly Lock _gate = new();
+    private (int ProcessId, int Ticks) _fullscreenCandidate;
     private Timer? _timer;
     private int _ticking;
 
@@ -70,7 +75,13 @@ public sealed class GameDetector : IDisposable
     /// <summary>Raised when the active game's window moved to another monitor or changed.</summary>
     public event EventHandler<GameSession>? WindowChanged;
 
-    public void Start() => _timer ??= new Timer(_ => Tick(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
+    public void Start()
+    {
+        // Older versions could mistake tools (e.g. Lightshot) for games; drop those entries.
+        _library.RemoveWhere(g => g.Source == GameSource.Detected &&
+                                  g.ProcessNames.Any(p => NotGames.Contains(Path.GetFileNameWithoutExtension(p))));
+        _timer ??= new Timer(_ => Tick(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
+    }
 
     public void Tick()
     {
@@ -174,6 +185,15 @@ public sealed class GameDetector : IDisposable
         var game = _library.Match(window.ExePath, window.ProcessName);
         if (game is null && _settings.Current.DetectUnknownFullscreen && window.IsFullscreen && !IsSystemPath(window.ExePath))
         {
+            // A screenshot overlay or a splash screen is full screen for a moment; a game stays.
+            _fullscreenCandidate = _fullscreenCandidate.ProcessId == window.ProcessId
+                ? (window.ProcessId, _fullscreenCandidate.Ticks + 1)
+                : (window.ProcessId, 1);
+            if (_fullscreenCandidate.Ticks < 3)
+            {
+                return null;
+            }
+
             game = _library.AddDetected(window.ExePath, window.ProcessName, window.Title);
         }
 

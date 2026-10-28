@@ -67,6 +67,22 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial double BufferFill { get; set; }
 
+    /// <summary>Segment the buffer ring shows as "being written" (moves one step per 2-second segment).</summary>
+    [ObservableProperty]
+    public partial int RingHead { get; set; }
+
+    public bool IsLive => IsBuffering || IsManualRecording;
+
+    /// <summary>Seconds of footage ready for a clip, shown inside the big ring.</summary>
+    [ObservableProperty]
+    public partial string BufferedText { get; set; } = "—";
+
+    public string Version { get; } = "v" + (typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.0.0");
+
+    partial void OnIsBufferingChanged(bool value) => OnPropertyChanged(nameof(IsLive));
+
+    partial void OnIsManualRecordingChanged(bool value) => OnPropertyChanged(nameof(IsLive));
+
     public string SaveHotkey => _services.Settings.Current.SaveClipHotkey;
 
     [RelayCommand]
@@ -142,7 +158,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             var buffered = recorder?.Session?.BufferedSeconds ?? 0;
             BufferFill = Math.Clamp(buffered / Math.Max(1, settings.ClipSeconds), 0, 1);
-            StatusTitle = "Arka plan kaydı açık";
+            BufferedText = $"{Math.Min(buffered, settings.ClipSeconds):0}";
+            StatusTitle = "Kaydediliyor";
             StatusDetail = $"{gameName ?? "Masaüstü"} · {Math.Min(buffered, settings.ClipSeconds):0}/{settings.ClipSeconds} sn hazır";
         }
         else if (recorder?.Status == RecorderStatus.Starting)
@@ -168,8 +185,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         if (!IsBuffering)
         {
-            BufferFill = 0;
+            BufferFill = IsManualRecording ? 1 : 0;
+            BufferedText = "—";
         }
+
+        RingHead = (int)(DateTime.Now.Ticks / TimeSpan.FromSeconds(VideoMath.SegmentSeconds).Ticks % 15);
 
         if (ReferenceEquals(CurrentPage, Home))
         {

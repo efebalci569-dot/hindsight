@@ -3,25 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Hindsight" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
-        SizeToContent="WidthAndHeight" Focusable="False" Opacity="0">
-    <Border Margin="12" Background="#F21B1B26" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="14"
-            Padding="14,12,18,12" MinWidth="280" MaxWidth="380">
+        SizeToContent="WidthAndHeight" Focusable="False" Opacity="0" FontFamily="{StaticResource UiFont}">
+    <Border Margin="14" Background="#F5121219" BorderBrush="{StaticResource CardEdgeBrush}" BorderThickness="1" CornerRadius="16"
+            MinWidth="300" MaxWidth="400">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.55" Color="Black" />
+            <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.6" Color="Black" />
         </Border.Effect>
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Border x:Name="IconCircle" Width="36" Height="36" CornerRadius="18" Background="{StaticResource AccentGradient}" VerticalAlignment="Center">
-                <TextBlock x:Name="IconGlyph" Text="&#xE73E;" Style="{StaticResource Icon}" Foreground="White" FontSize="15" />
-            </Border>
-            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                <TextBlock x:Name="TitleText" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" FontFamily="{StaticResource UiFont}" />
-                <TextBlock x:Name="MessageText" FontSize="12.5" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"
-                           FontFamily="{StaticResource UiFont}" />
-            </StackPanel>
+            <Grid Margin="14,13,20,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="IconCircle" Width="40" Height="40" CornerRadius="12" Background="{StaticResource AccentGradient}" VerticalAlignment="Center">
+                    <TextBlock x:Name="IconGlyph" Text="&#xE73E;" Style="{StaticResource Icon}" Foreground="White" FontSize="16" />
+                </Border>
+                <StackPanel Grid.Column="1" Margin="13,0,0,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" FontFamily="{StaticResource DisplayFont}" />
+                    <TextBlock x:Name="MessageText" FontSize="12.5" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                </StackPanel>
+            </Grid>
+            <!-- Time left before the card hides -->
+            <Border x:Name="Progress" Height="3" CornerRadius="1.5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="14,0,14,6"
+                    Background="{StaticResource AccentGradient}" Opacity="0.85" />
         </Grid>
     </Border>
 </Window>

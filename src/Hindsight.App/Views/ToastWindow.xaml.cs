@@ -9,8 +9,9 @@ using Hindsight.Core;
 namespace Hindsight.App.Views;
 
 /// <summary>
-/// A small "clip saved" card in the bottom-right corner. It never takes focus and lets clicks pass
-/// through, so it cannot interrupt a game. One instance is reused for every notice.
+/// A small "clip saved" card in the bottom-right corner of the screen the game is on. It never takes focus
+/// and lets clicks pass through, so it cannot interrupt a game. One instance is reused for every notice.
+/// (Games in exclusive full screen hide every other window; the confirmation sound covers that case.)
 /// </summary>
 public partial class ToastWindow : Window
 {
@@ -18,7 +19,8 @@ public partial class ToastWindow : Window
     private const int WsExTransparent = 0x20;
     private const int WsExToolWindow = 0x80;
     private const int WsExNoActivate = 0x08000000;
-    private readonly DispatcherTimer _hide = new() { Interval = TimeSpan.FromSeconds(3.2) };
+    private static readonly TimeSpan Visible = TimeSpan.FromSeconds(3.4);
+    private readonly DispatcherTimer _hide = new() { Interval = Visible };
 
     public ToastWindow()
     {
@@ -55,16 +57,51 @@ public partial class ToastWindow : Window
         }
 
         Place();
+        BringToTop();
         BeginAnimation(OpacityProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(160)));
+        Progress.BeginAnimation(WidthProperty, new DoubleAnimation(Math.Max(0, ActualWidth - 56), 0, Visible));
         _hide.Stop();
         _hide.Start();
     }
 
+    /// <summary>Bottom-right of the work area of the monitor the foreground window (the game) is on.</summary>
     private void Place()
     {
         var area = SystemParameters.WorkArea;
-        Left = area.Right - ActualWidth - 8;
-        Top = area.Bottom - ActualHeight - 8;
+        var monitor = MonitorFromWindow(GetForegroundWindow(), 2 /* nearest */);
+        var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        if (monitor != IntPtr.Zero && GetMonitorInfo(monitor, ref info) && PresentationSource.FromVisual(this) is { CompositionTarget: { } target })
+        {
+            var toDip = target.TransformFromDevice;
+            var topLeft = toDip.Transform(new Point(info.Work.Left, info.Work.Top));
+            var bottomRight = toDip.Transform(new Point(info.Work.Right, info.Work.Bottom));
+            area = new Rect(topLeft, bottomRight);
+        }
+
+        Left = area.Right - ActualWidth - 6;
+        Top = area.Bottom - ActualHeight - 6;
+    }
+
+    /// <summary>Re-asserts "topmost": borderless full-screen games put themselves above earlier topmost windows.</summary>
+    private void BringToTop()
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        SetWindowPos(hwnd, new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 | 0x0040); // NOSIZE|NOMOVE|NOACTIVATE|SHOWWINDOW
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect
+    {
+        public int Left, Top, Right, Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo
+    {
+        public int Size;
+        public NativeRect Monitor;
+        public NativeRect Work;
+        public uint Flags;
     }
 
     [DllImport("user32.dll")]
@@ -72,4 +109,16 @@ public partial class ToastWindow : Window
 
     [DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hwnd, int index, int value);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
 }

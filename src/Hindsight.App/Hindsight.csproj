@@ -44,6 +44,7 @@
   <ItemGroup>
     <Resource Include="Resources\hindsight.ico" />
     <Resource Include="Resources\logo.png" />
+    <Resource Include="Resources\Fonts\*.ttf" />
   </ItemGroup>
 
   <!-- Bundled ffmpeg (scripts/fetch-ffmpeg.ps1 puts it in <repo>\ffmpeg). Without it the app looks on PATH / C:\ffmpeg\bin. -->

@@ -83,7 +83,8 @@ public sealed class AppSettings
 
     public string ScreenshotHotkey { get; set; } = "Alt+F12";
 
-    public string ToggleBufferHotkey { get; set; } = "Ctrl+Alt+F8";
+    // No Ctrl by default: in many games Ctrl is crouch, so the game would react to the shortcut too.
+    public string ToggleBufferHotkey { get; set; } = "Alt+F6";
 
     // ── Storage ──────────────────────────────────────────────────────────────
     public string? ClipsFolder { get; set; }
@@ -113,6 +114,11 @@ public sealed class AppSettings
 
     public bool FirstRunCompleted { get; set; }
 
+    /// <summary>Bumped when defaults change in a way old settings files should follow.</summary>
+    public int SettingsVersion { get; set; }
+
+    public const int CurrentSettingsVersion = 2;
+
     /// <summary>Game ids the user does not want recorded.</summary>
     public List<string> ExcludedGames { get; set; } = [];
 
@@ -127,6 +133,17 @@ public sealed class AppSettings
     /// <summary>Clamps values that came from an edited or old settings file.</summary>
     public AppSettings Normalize()
     {
+        if (SettingsVersion < 2)
+        {
+            // 0.1.0 shipped Ctrl+Alt+F8; Ctrl collides with crouch in many games.
+            if (ToggleBufferHotkey == "Ctrl+Alt+F8")
+            {
+                ToggleBufferHotkey = "Alt+F6";
+            }
+
+            SettingsVersion = CurrentSettingsVersion;
+        }
+
         ClipSeconds = Math.Clamp(ClipSeconds, 10, 600);
         Fps = Fps >= 45 ? 60 : 30;
         CustomBitrateMbps = Math.Clamp(CustomBitrateMbps, 2, 50);

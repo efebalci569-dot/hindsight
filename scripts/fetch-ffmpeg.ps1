@@ -1,9 +1,12 @@
 # Downloads the FFmpeg build that ships with Hindsight (BtbN/FFmpeg-Builds, win64 gpl-shared - the same
 # variant the recorder is developed and tested against) into <repo>\ffmpeg, keeping only what Hindsight uses,
 # and checks that the features the recorder needs are present.
-# Usage: pwsh scripts/fetch-ffmpeg.ps1 [-Tag latest] [-Source C:\ffmpeg\bin]   (-Source copies a local build instead)
+# Pinned to a month-end build: BtbN keeps those, while daily builds disappear - and FFmpeg master changes its
+# option rules now and then (0.1.0 shipped a daily build that broke recording). Bump deliberately, then run
+# tests/Hindsight.Tests (FfmpegCompatibilityTests) with HINDSIGHT_FFMPEG pointing at the new build.
+# Usage: pwsh scripts/fetch-ffmpeg.ps1 [-Tag autobuild-...|latest] [-Source C:\ffmpeg\bin]   (-Source copies a local build)
 param(
-    [string]$Tag = 'latest',
+    [string]$Tag = 'autobuild-2026-09-30-13-08',
     [string]$Source
 )
 $ErrorActionPreference = 'Stop'

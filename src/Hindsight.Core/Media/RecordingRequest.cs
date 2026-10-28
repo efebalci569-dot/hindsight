@@ -34,5 +34,8 @@ public sealed record RecordingRequest(
     RecorderPriority Priority,
     bool CaptureCursor);
 
-/// <summary>One concrete way to run the capture → encoder chain. Several are tried until one starts.</summary>
-public sealed record PipelineVariant(EncoderInfo Encoder, bool UseGfxCapture, string? VideoFilter, string Label);
+/// <summary>
+/// One concrete way to run the capture → encoder chain. Several are tried until one starts.
+/// <paramref name="MonitorFallback"/>: the request asked for a window, but this variant records the window's monitor instead.
+/// </summary>
+public sealed record PipelineVariant(EncoderInfo Encoder, bool UseGfxCapture, string? VideoFilter, string Label, bool MonitorFallback = false);

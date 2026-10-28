@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://hindsight-clips.vercel.app">Web sitesi</a> ·
   <a href="https://github.com/efebalci569-dot/hindsight/releases/latest">İndir</a> ·
-  <a href="docs/releases/0.1.0.md">Sürüm notları</a>
+  <a href="docs/releases/0.2.0.md">Sürüm notları</a>
 </p>
 
 ---
@@ -20,7 +20,8 @@
 - **Oyun kütüphanesi** — Steam, Epic Games, GOG, Ubisoft Connect, EA app, Battle.net, Riot Games, Rockstar ve Xbox / Microsoft Store oyunlarını bulur ve platform platform bölümlere ayırır. Listede olmayan bir oyunu tam ekran oynadığında onu da kendiliğinden ekler.
 - **Klipler oyun oyun** — Her oyunun kendi klasörü (`Videolar\Hindsight\<Oyun>`), favoriler, arama ve sıralama. Oynatıcıda kırp, Discord için 10/50 MB'a küçült, GIF yap, panoya kopyala ve Discord'a yapıştır.
 - **Senin ayarların** — 480p – 1080p, 30 / 60 FPS, kalite ya da özel bit hızı, H.264 / HEVC / AV1, kodlayıcı seçimi, oyun penceresi ya da tüm ekran, sistem sesi + mikrofon, kısayollar, depolama sınırı.
-- **Ekstralar** — Süre sınırı olmayan manuel kayıt (`Alt+F7`), tam çözünürlükte ekran görüntüsü (`Alt+F12`), oyun başına "bu oyunu kaydetme", Hindsight'ın ölçtüğü oynama süresi, oyun içinde odağı çalmayan bildirim, tepside çalışma, Windows ile başlatma.
+- **Ekstralar** — Süre sınırı olmayan manuel kayıt (`Alt+F7`), tam çözünürlükte ekran görüntüsü (`Alt+F12`), arka plan kaydını aç/kapat (`Alt+F6`), oyun başına "bu oyunu kaydetme", Hindsight'ın ölçtüğü oynama süresi, oyun içinde odağı çalmayan bildirim, tepside çalışma, Windows ile başlatma.
+- **Sorun giderme** — Ayarlar → Kayıt → **Kaydı test et**: mevcut ayarlarla 4 saniyelik deneme kaydı yapar ve hangi kodlayıcının çalıştığını gösterir. Ayrıntılı günlük: Ayarlar → Sistem ve hakkında → Günlük dosyasını aç.
 
 ## Neden hafif?
 
@@ -59,12 +60,12 @@ dotnet test Hindsight.sln
 
 - `src/Hindsight.Core` — kayıt motoru (ffmpeg + WASAPI ses), oyun tarayıcıları, oyun algılama, klip kütüphanesi
 - `src/Hindsight.App` — WPF arayüz, tepsi, global kısayollar
-- `tests/Hindsight.Tests` — birim testleri; `HINDSIGHT_INTEGRATION=1` ile gerçek ekran + ses kaydı testi, `HINDSIGHT_SYNC=1` ile ses/görüntü senkron ölçümü
+- `tests/Hindsight.Tests` — birim testleri; `FfmpegCompatibilityTests` uygulamanın çalıştırdığı her ffmpeg komutunu pakete giren derlemeyle çalıştırır (`HINDSIGHT_FFMPEG` ile başka bir derleme seçilebilir); `HINDSIGHT_INTEGRATION=1` ile gerçek ekran + ses kaydı testi, `HINDSIGHT_SYNC=1` ile ses/görüntü senkron ölçümü
 - `site/` — indirme sitesi (Vercel)
 - `installer/` — Inno Setup kurulum betiği
 
 Geliştirirken ffmpeg `PATH`'te ya da `C:\ffmpeg\bin` altında aranır; paket için `scripts/fetch-ffmpeg.ps1` ve `scripts/publish.ps1`.
-Arayüz önizlemesi (pencere açmadan, kayıt yapmadan): `Hindsight.exe --data-dir <klasör> --capture shot.png --page games`.
+Arayüz önizlemesi (pencere açmadan): `Hindsight.exe --data-dir <klasör> --capture shot.png --page games` (`--live` eklenirse kayıt da çalışır). Uçtan uca kontrol: `--data-dir <klasör> --selftest`.
 
 Yeni sürüm: `Directory.Build.props` içindeki `Version`'ı artır, `docs/releases/X.Y.Z.md` ekle, `vX.Y.Z` etiketini gönder — GitHub Actions kurulum dosyasını ve zip'i yayınlar.
 

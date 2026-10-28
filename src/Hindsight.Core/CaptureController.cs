@@ -340,12 +340,74 @@ public sealed class CaptureController : IAsyncDisposable
     /// <summary>Hotkey / button: switch the background buffer on or off regardless of the mode.</summary>
     public async Task ToggleBufferAsync()
     {
-        _override = !(IsBuffering || Recorder?.Status == RecorderStatus.Starting);
+        var turnOn = !(IsBuffering || Recorder?.Status == RecorderStatus.Starting);
+        _override = turnOn;
         _gaveUp = false;
         _failures.Clear();
         await EvaluateAsync().ConfigureAwait(false);
-        Notify(_override == true ? "Arka plan kaydı açık" : "Arka plan kaydı kapalı",
-            _override == true ? "Son anlar kaydediliyor." : "Kısayolla tekrar açabilirsin.", NoticeKind.Info);
+
+        // Report what actually happened (a failed start already showed its own error).
+        if (!turnOn)
+        {
+            Notify("Arka plan kaydı kapalı", "Kısayolla tekrar açabilirsin.", NoticeKind.Info);
+        }
+        else if (IsBuffering)
+        {
+            Notify("Arka plan kaydı açık", $"Son {_settings.Current.ClipSeconds} saniye tutuluyor.", NoticeKind.Info);
+        }
+    }
+
+    /// <summary>
+    /// Settings → "Test recording": records 4 s of the primary monitor with the current settings in a
+    /// throw-away folder, saves a 2 s clip and checks it. Returns a human-readable verdict.
+    /// </summary>
+    public async Task<(bool Ok, string Message)> TestRecordingAsync()
+    {
+        if (Caps is null)
+        {
+            return (false, InitError ?? "Kayıt motoru hazır değil.");
+        }
+
+        var root = Path.Combine(AppPaths.LocalDir, "selftest");
+        try
+        {
+            var request = BuildRequest(null) with { BufferRoot = Path.Combine(root, "buffer"), ClipSeconds = 10 };
+            await using var recorder = new ReplayRecorder(Caps);
+            if (!await recorder.StartAsync(request).ConfigureAwait(false))
+            {
+                return (false, "Kayıt başlatılamadı. Ayrıntılar günlük dosyasında.");
+            }
+
+            var variant = recorder.Session!.Variant;
+            await Task.Delay(TimeSpan.FromSeconds(4)).ConfigureAwait(false);
+            var clip = await recorder.SaveReplayAsync(2, Path.Combine(root, "test.mp4")).ConfigureAwait(false);
+            var info = Tools is null ? null : await Tools.ProbeAsync(clip.Path).ConfigureAwait(false);
+            await recorder.StopAsync().ConfigureAwait(false);
+            if (info is null || info.DurationSeconds < 1)
+            {
+                return (false, "Kayıt başladı ama klip okunamadı. Ayrıntılar günlük dosyasında.");
+            }
+
+            var audio = request.Audio.Enabled ? (info.HasAudio ? " · ses var" : " · ses YOK") : string.Empty;
+            return (true, $"Çalışıyor: {variant.Encoder.DisplayName} ({(variant.Label.StartsWith("gpu-zero-copy", StringComparison.Ordinal) ? "tamamen GPU'da" : variant.Label)}) · {info.Width}×{info.Height}{audio}");
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
+        {
+            return (false, ex.Message);
+        }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(root))
+                {
+                    Directory.Delete(root, recursive: true);
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+            }
+        }
     }
 
     /// <summary>Back to "follow the recording mode" after a manual toggle.</summary>

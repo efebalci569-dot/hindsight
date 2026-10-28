@@ -3,15 +3,15 @@
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
     <!-- ── Palette ─────────────────────────────────────────────────────────── -->
-    <Color x:Key="BgColor">#0B0B10</Color>
-    <Color x:Key="SidebarColor">#0F0F16</Color>
-    <Color x:Key="SurfaceColor">#14141D</Color>
-    <Color x:Key="Surface2Color">#1B1B26</Color>
-    <Color x:Key="Surface3Color">#23232F</Color>
-    <Color x:Key="BorderColor">#2A2A38</Color>
-    <Color x:Key="TextColor">#F4F4F7</Color>
-    <Color x:Key="MutedColor">#A2A2B5</Color>
-    <Color x:Key="DimColor">#6C6C80</Color>
+    <Color x:Key="BgColor">#08080C</Color>
+    <Color x:Key="SidebarColor">#0B0B11</Color>
+    <Color x:Key="SurfaceColor">#121219</Color>
+    <Color x:Key="Surface2Color">#191922</Color>
+    <Color x:Key="Surface3Color">#22222D</Color>
+    <Color x:Key="BorderColor">#24242F</Color>
+    <Color x:Key="TextColor">#F5F5F8</Color>
+    <Color x:Key="MutedColor">#A4A4B8</Color>
+    <Color x:Key="DimColor">#6B6B80</Color>
     <Color x:Key="AccentColor">#FF4D5E</Color>
     <Color x:Key="Accent2Color">#FF9F43</Color>
     <Color x:Key="SuccessColor">#34D399</Color>
@@ -34,35 +34,70 @@
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
-    <SolidColorBrush x:Key="AccentSoftBrush" Color="#26FF4D5E" />
-    <SolidColorBrush x:Key="HoverBrush" Color="#14FFFFFF" />
-    <SolidColorBrush x:Key="PressedBrush" Color="#22FFFFFF" />
-    <SolidColorBrush x:Key="OverlayBrush" Color="#B30B0B10" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#24FF4D5E" />
+    <SolidColorBrush x:Key="HoverBrush" Color="#12FFFFFF" />
+    <SolidColorBrush x:Key="PressedBrush" Color="#20FFFFFF" />
+    <SolidColorBrush x:Key="OverlayBrush" Color="#B308080C" />
+    <!-- Translucent surfaces let the window's ambient glow show through: a glass look without blur cost. -->
+    <SolidColorBrush x:Key="GlassBrush" Color="#C8121219" />
+    <SolidColorBrush x:Key="Glass2Brush" Color="#D8191922" />
 
     <LinearGradientBrush x:Key="AccentGradient" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#FF5468" Offset="0" />
         <GradientStop Color="#FF8F45" Offset="1" />
     </LinearGradientBrush>
-    <LinearGradientBrush x:Key="HeroGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#2A1520" Offset="0" />
-        <GradientStop Color="#181420" Offset="0.55" />
-        <GradientStop Color="#14141D" Offset="1" />
+    <LinearGradientBrush x:Key="AccentGlowGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#38FF5468" Offset="0" />
+        <GradientStop Color="#18FF8F45" Offset="1" />
     </LinearGradientBrush>
+    <LinearGradientBrush x:Key="HeroGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2B1420" Offset="0" />
+        <GradientStop Color="#17121D" Offset="0.55" />
+        <GradientStop Color="#121219" Offset="1" />
+    </LinearGradientBrush>
+    <!-- Card edge: a little lighter at the top, like light hitting glass. -->
+    <LinearGradientBrush x:Key="CardEdgeBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#2CFFFFFF" Offset="0" />
+        <GradientStop Color="#0DFFFFFF" Offset="0.45" />
+        <GradientStop Color="#0AFFFFFF" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ShadeGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00000000" Offset="0.35" />
+        <GradientStop Color="#E6000000" Offset="1" />
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="AmbientRed" Center="0.1,0.0" GradientOrigin="0.1,0.0" RadiusX="0.6" RadiusY="0.75">
+        <GradientStop Color="#30FF4D5E" Offset="0" />
+        <GradientStop Color="#00FF4D5E" Offset="1" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="AmbientAmber" Center="0.98,1.0" GradientOrigin="0.98,1.0" RadiusX="0.55" RadiusY="0.65">
+        <GradientStop Color="#1EFF9F43" Offset="0" />
+        <GradientStop Color="#00FF9F43" Offset="1" />
+    </RadialGradientBrush>
 
-    <FontFamily x:Key="UiFont">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <!-- Embedded fonts (SIL OFL): Sora for display text, Inter for everything else. -->
+    <FontFamily x:Key="UiFont">pack://application:,,,/Hindsight;component/Resources/Fonts/#Inter, Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="DisplayFont">pack://application:,,,/Hindsight;component/Resources/Fonts/#Sora, Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas</FontFamily>
     <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
-    <sys:Double x:Key="RadiusLarge">14</sys:Double>
-    <CornerRadius x:Key="CardRadius">14</CornerRadius>
-    <CornerRadius x:Key="ControlRadius">9</CornerRadius>
+    <sys:Double x:Key="RadiusLarge">16</sys:Double>
+    <CornerRadius x:Key="CardRadius">16</CornerRadius>
+    <CornerRadius x:Key="ControlRadius">10</CornerRadius>
 
     <!-- ── Text ────────────────────────────────────────────────────────────── -->
     <Style x:Key="PageTitle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+        <Setter Property="FontSize" Value="28" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
     </Style>
     <Style x:Key="SectionTitle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+        <Setter Property="FontSize" Value="15.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+    </Style>
+    <Style x:Key="Display" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
     </Style>
@@ -70,9 +105,15 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="19" />
     </Style>
     <Style x:Key="Caption" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="Foreground" Value="{StaticResource DimBrush}" />
+    </Style>
+    <Style x:Key="Overline" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource DimBrush}" />
     </Style>
     <Style x:Key="Icon" TargetType="TextBlock">
@@ -83,11 +124,20 @@
     </Style>
 
     <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="Background" Value="{StaticResource GlassBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource CardEdgeBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="{StaticResource CardRadius}" />
         <Setter Property="Padding" Value="20" />
+    </Style>
+    <!-- Small rounded square holding an icon (section headers, stat tiles). -->
+    <Style x:Key="IconTile" TargetType="Border">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Background" Value="{StaticResource AccentGlowGradient}" />
+        <Setter Property="BorderBrush" Value="#40FF7A5A" />
+        <Setter Property="BorderThickness" Value="1" />
     </Style>
 
     <!-- ── Buttons ─────────────────────────────────────────────────────────── -->
@@ -194,11 +244,12 @@
         </Setter>
     </Style>
 
-    <!-- Sidebar navigation (RadioButton) -->
+    <!-- Sidebar navigation (RadioButton): icon in a rounded tile that lights up when selected. -->
     <Style x:Key="NavButton" TargetType="RadioButton">
         <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="Height" Value="42" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Height" Value="48" />
         <Setter Property="Margin" Value="0,2" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -206,22 +257,31 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid>
-                        <Border x:Name="Bd" Background="Transparent" CornerRadius="10" />
-                        <Border x:Name="Bar" Width="3" Height="18" HorizontalAlignment="Left" CornerRadius="2"
-                                Background="{StaticResource AccentGradient}" Opacity="0" Margin="0,0,0,0" />
-                        <StackPanel Orientation="Horizontal" Margin="16,0,12,0" VerticalAlignment="Center">
-                            <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource Icon}" FontSize="16" Width="22" Foreground="{TemplateBinding Foreground}" />
-                            <ContentPresenter Margin="12,0,0,0" VerticalAlignment="Center" />
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="13" />
+                        <StackPanel Orientation="Horizontal" Margin="8,0,12,0" VerticalAlignment="Center">
+                            <Border x:Name="Tile" Width="34" Height="34" CornerRadius="10" Background="{StaticResource Surface2Brush}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" Style="{StaticResource Icon}" FontSize="15" Foreground="{StaticResource MutedBrush}" />
+                            </Border>
+                            <ContentPresenter Margin="13,0,0,0" VerticalAlignment="Center" />
                         </StackPanel>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBrush}" />
                             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource TextBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface2Brush}" />
-                            <Setter TargetName="Bar" Property="Opacity" Value="1" />
+                            <Setter TargetName="Bd" Property="Background" Value="#0FFFFFFF" />
+                            <Setter TargetName="Tile" Property="Background" Value="{StaticResource AccentGradient}" />
+                            <Setter TargetName="Tile" Property="BorderThickness" Value="0" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="White" />
+                            <Setter TargetName="Tile" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FF4D5E" BlurRadius="16" ShadowDepth="0" Opacity="0.55" />
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
                             <Setter Property="FontWeight" Value="SemiBold" />
                         </Trigger>
@@ -235,6 +295,7 @@
     <Style x:Key="PillToggle" TargetType="RadioButton">
         <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
         <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Margin" Value="0,0,6,0" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -242,7 +303,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="Bd" Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
-                            CornerRadius="16" Padding="12,5">
+                            CornerRadius="17" Padding="14,6">
                         <ContentPresenter VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -250,9 +311,90 @@
                             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentSoftBrush}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGradient}" />
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="0" />
+                            <Setter TargetName="Bd" Property="Padding" Value="15,7" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Segment inside a SegmentBar (RadioButton): e.g. 30 | 60 FPS, 480p … 1080p -->
+    <Style x:Key="Segment" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="MinWidth" Value="58" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Bd" Background="Transparent" CornerRadius="8" Padding="12,7" Margin="2">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGradient}" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="SegmentBar" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface2Brush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="11" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <!-- Large selectable card (RadioButton): Tag = icon glyph, Content = title, ToolTip-free description via Uid. -->
+    <Style x:Key="OptionCard" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Margin" Value="0,0,10,0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Bd" Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
+                            CornerRadius="14" Padding="14,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="Tile" Width="34" Height="34" CornerRadius="10" Background="{StaticResource Surface3Brush}" VerticalAlignment="Top">
+                                <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" Style="{StaticResource Icon}" FontSize="15" Foreground="{StaticResource MutedBrush}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                <ContentPresenter TextBlock.FontWeight="SemiBold" TextBlock.FontSize="13.5" />
+                                <TextBlock Text="{TemplateBinding Uid}" Foreground="{StaticResource DimBrush}" FontSize="11.5" TextWrapping="Wrap" Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#3A3A48" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            <Setter TargetName="Bd" Property="Background" Value="#1CFF4D5E" />
+                            <Setter TargetName="Tile" Property="Background" Value="{StaticResource AccentGradient}" />
+                            <Setter TargetName="Glyph" Property="Foreground" Value="White" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -616,12 +758,52 @@
         </Setter>
     </Style>
 
+    <!-- A whole card that is a button (quick actions). -->
+    <Style x:Key="TileButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{StaticResource GlassBrush}" BorderBrush="{StaticResource CardEdgeBrush}" BorderThickness="1"
+                            CornerRadius="16" Padding="16,14">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#66FF6A5A" />
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Glass2Brush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface3Brush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Keyboard key chip, e.g. Alt+F8 -->
     <Style x:Key="KeyChip" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource Surface3Brush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-        <Setter Property="BorderThickness" Value="1,1,1,2" />
-        <Setter Property="CornerRadius" Value="6" />
-        <Setter Property="Padding" Value="7,2" />
+        <Setter Property="BorderBrush" Value="#3A3A4A" />
+        <Setter Property="BorderThickness" Value="1,1,1,2.5" />
+        <Setter Property="CornerRadius" Value="7" />
+        <Setter Property="Padding" Value="8,3" />
+    </Style>
+    <Style x:Key="KeyText" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+    </Style>
+    <!-- Status pill, e.g. "● Kaydediliyor" -->
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="Background" Value="#1FFFFFFF" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 </ResourceDictionary>

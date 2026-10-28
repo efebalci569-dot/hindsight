@@ -169,9 +169,15 @@ public partial class App : Application
     private async Task CaptureScreenshotAsync(string path)
     {
         var services = _services!;
+        var live = Args.Contains("--live"); // also run the recorder (records the screen into the --data-dir)
         services.Clips.Refresh();
         await services.Games.ScanAsync();
-        await services.Capture.InitializeAsync(startRecording: false);
+        if (live)
+        {
+            services.Settings.Update(s => s.Mode = RecordingMode.Always);
+        }
+
+        await services.Capture.InitializeAsync(startRecording: live);
         var actions = new ClipActions(services, _ => { });
         var vm = new MainViewModel(services, actions, _ => { });
         vm.Navigate(ArgValue("--page") ?? "home");
@@ -204,6 +210,11 @@ public partial class App : Application
         Log.Info($"Captured {path}; working set {Process.GetCurrentProcess().WorkingSet64 / 1048576} MB.");
         window.Close();
         vm.Dispose();
+        if (live)
+        {
+            await services.Capture.DisposeAsync();
+        }
+
         Shutdown();
     }
 
@@ -229,6 +240,8 @@ public partial class App : Application
         await Task.Delay(TimeSpan.FromSeconds(4));
         await capture.ToggleManualRecordingAsync();
         Log.Info($"[selftest] library now has {services.Clips.Items.Count} items: {string.Join(" | ", services.Clips.Items.Select(i => $"{i.Meta.Kind}:{i.GameName}:{i.Meta.DurationSeconds:0.0}s"))}");
+        var test = await capture.TestRecordingAsync();
+        Log.Info($"[selftest] settings test-recording: ok={test.Ok} — {test.Message}");
         await capture.DisposeAsync();
         Log.Info($"[selftest] done; ffmpeg left running: {Process.GetProcessesByName("ffmpeg").Length}");
         Shutdown();

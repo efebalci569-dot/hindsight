@@ -6,7 +6,7 @@ namespace Hindsight.App.Views;
 
 public partial class GamesView : UserControl
 {
-    private const double CardWidth = 180; // 164 + 16 gap
+    private const double CardWidth = 184; // 168 + 16 gap
 
     public GamesView() => InitializeComponent();
 

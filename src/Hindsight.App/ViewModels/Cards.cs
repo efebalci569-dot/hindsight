@@ -252,7 +252,18 @@ public sealed partial class GameCardViewModel : ObservableObject
     }
 }
 
-public sealed record HeaderRow(string Title, string Subtitle);
+/// <summary>Section header in a virtualized list. Badge = short text in a coloured tile (platform or game initials).</summary>
+public sealed record HeaderRow(string Title, string Subtitle, string Badge = "", string BadgeColor = "#2A2A36")
+{
+    public System.Windows.Media.Brush BadgeBrush { get; } = Frozen(BadgeColor);
+
+    private static System.Windows.Media.Brush Frozen(string color)
+    {
+        var brush = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color));
+        brush.Freeze();
+        return brush;
+    }
+}
 
 public sealed record ClipRow(IReadOnlyList<ClipCardViewModel> Items);
 

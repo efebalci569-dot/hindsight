@@ -114,6 +114,7 @@ public sealed class ReplayRecorder : IAsyncDisposable
             }
 
             var errors = new StringBuilder();
+            string? firstFailure = null;
             foreach (var variant in variants)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -124,17 +125,20 @@ public sealed class ReplayRecorder : IAsyncDisposable
                 {
                     Session = session;
                     LastError = null;
-                    Log.Info($"Replay buffer started: {variant.Encoder.DisplayName} [{variant.Label}] {request.Width}x{request.Height}@{request.Fps} {request.VideoKbps} kbps, {request.ClipSeconds}s, {request.Source.Description}");
+                    Log.Info($"Replay buffer started: {variant.Encoder.DisplayName} [{variant.Label}] {request.Width}x{request.Height}@{request.Fps} {request.VideoKbps} kbps, {request.ClipSeconds}s, {request.Source.Description}" +
+                             (variant.MonitorFallback ? " (window capture failed; recording its monitor)" : string.Empty));
                     SetStatus(RecorderStatus.Buffering);
                     return true;
                 }
 
-                errors.AppendLine($"{variant.Encoder.FfmpegName} [{variant.Label}]: {LastStderrLine()}");
+                errors.AppendLine($"  {variant.Encoder.FfmpegName} [{variant.Label}]: {LastStderrLine()}");
+                // The first failure carries the real cause; keep ffmpeg's full output for the log.
+                firstFailure ??= string.Join(Environment.NewLine, RecentLog().Select(l => "    " + l));
                 TryDeleteDirectory(directory);
             }
 
-            LastError = "Kayıt başlatılamadı. " + errors.ToString().Trim();
-            Log.Error(LastError);
+            LastError = "Kayıt başlatılamadı. Ayrıntılar günlük dosyasında (Ayarlar > Sistem ve hakkında).";
+            Log.Error($"Recording could not start. Tried:{Environment.NewLine}{errors}First attempt's ffmpeg output:{Environment.NewLine}{firstFailure}");
             SetStatus(RecorderStatus.Failed);
             return false;
         }
@@ -245,8 +249,8 @@ public sealed class ReplayRecorder : IAsyncDisposable
 
         session.Audio?.Dispose();
         session.Audio = null;
-        LastError = "Kayıt beklenmedik şekilde durdu: " + LastStderrLine();
-        Log.Warn(LastError);
+        LastError = "Kayıt beklenmedik şekilde durdu; yeniden deneniyor.";
+        Log.Warn($"ffmpeg exited while buffering: {string.Join(" | ", RecentLog().TakeLast(6))}");
         SetStatus(RecorderStatus.Failed);
     }
 

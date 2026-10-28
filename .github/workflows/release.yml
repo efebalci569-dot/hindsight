@@ -36,14 +36,17 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Unit tests
-        run: dotnet test Hindsight.sln -c Release
-
-      - name: Fetch FFmpeg (BtbN win64 gpl-shared)
+      - name: Fetch FFmpeg (pinned BtbN win64 gpl-shared build)
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: ./scripts/fetch-ffmpeg.ps1 -Tag latest
+        run: ./scripts/fetch-ffmpeg.ps1
+
+      # Includes FfmpegCompatibilityTests: every ffmpeg command line Hindsight uses must run on the shipped build.
+      - name: Tests (against the ffmpeg that ships)
+        env:
+          HINDSIGHT_FFMPEG: ${{ github.workspace }}/ffmpeg/ffmpeg.exe
+        run: dotnet test Hindsight.sln -c Release --logger "console;verbosity=normal"
 
       - name: Publish self-contained app
         shell: pwsh

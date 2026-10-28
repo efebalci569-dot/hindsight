@@ -6,7 +6,7 @@ namespace Hindsight.App.Views;
 
 public partial class ClipsView : UserControl
 {
-    private const double CardWidth = 284; // 268 + 16 gap
+    private const double CardWidth = 288; // 272 + 16 gap
 
     public ClipsView() => InitializeComponent();
 

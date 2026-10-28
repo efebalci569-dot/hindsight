@@ -22,6 +22,13 @@ public sealed partial class GameFilterItem(string? key, string name, int count, 
     public int Count { get; } = count;
 
     public string Glyph { get; } = glyph;
+
+    /// <summary>Two-letter avatar for game entries; empty for "all" / "favourites", which show their glyph.</summary>
+    public string Initials { get; } = key is null || key == "*fav"
+        ? string.Empty
+        : string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(w => char.ToUpperInvariant(w[0])));
+
+    public bool HasInitials => Initials.Length > 0;
 }
 
 /// <summary>Clips, grouped game by game. Uses virtualized rows so thousands of clips stay light on memory.</summary>
@@ -238,7 +245,8 @@ public sealed partial class ClipsViewModel : ObservableObject, IDisposable
             foreach (var group in list.GroupBy(c => c.GameName, StringComparer.OrdinalIgnoreCase)
                          .OrderByDescending(g => Sort == ClipSort.Newest ? g.Max(c => c.Item.Meta.CreatedAt) : DateTime.MinValue))
             {
-                Rows.Add(new HeaderRow(group.Key, Describe(group.ToList())));
+                var initials = string.Concat(group.Key.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(w => char.ToUpperInvariant(w[0])));
+                Rows.Add(new HeaderRow(group.Key, Describe(group.ToList()), initials, "#2C2C3A"));
                 foreach (var chunk in group.Chunk(_columns))
                 {
                     Rows.Add(new ClipRow(chunk));
@@ -260,6 +268,11 @@ public sealed partial class ClipsViewModel : ObservableObject, IDisposable
 
     private static string Describe(IReadOnlyCollection<ClipCardViewModel> cards)
     {
+        if (cards.Count == 0)
+        {
+            return "Henüz klip yok";
+        }
+
         var videos = cards.Count(c => c.IsVideo);
         var images = cards.Count - videos;
         var parts = new List<string>();

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Hindsight.App.Services;
@@ -16,6 +17,7 @@ public sealed partial class HomeViewModel : ObservableObject, IDisposable
     private TimeSpan _lastCpu;
     private DateTime _lastCpuAt = DateTime.UtcNow;
     private int _tick;
+    private string? _heroGameId = "(none)"; // forces the first load
 
     public HomeViewModel(AppServices services, MainViewModel main)
     {
@@ -32,6 +34,16 @@ public sealed partial class HomeViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool ShowWelcome { get; set; }
+
+    /// <summary>Cover art of the game being recorded (shown blurred behind the hero).</summary>
+    [ObservableProperty]
+    public partial ImageSource? HeroImage { get; set; }
+
+    [ObservableProperty]
+    public partial string HeroTitle { get; set; } = "Oyun bekleniyor";
+
+    [ObservableProperty]
+    public partial string HeroKicker { get; set; } = "BEKLEMEDE";
 
     [ObservableProperty]
     public partial string ProfileText { get; set; } = string.Empty;
@@ -77,6 +89,19 @@ public sealed partial class HomeViewModel : ObservableObject, IDisposable
     {
         var capture = _services.Capture;
         var s = _services.Settings.Current;
+        var game = capture.BufferGame ?? capture.ActiveGame?.Game;
+        if (game?.Id != _heroGameId)
+        {
+            _heroGameId = game?.Id;
+            HeroImage = null;
+            _ = LoadHeroAsync(game);
+        }
+
+        HeroTitle = game?.Name ?? (capture.IsBuffering ? "Masaüstü" : "Oyun bekleniyor");
+        HeroKicker = capture.IsManualRecording ? "KAYIT YAPILIYOR"
+            : capture.IsBuffering ? "ARKA PLANDA KAYDEDİLİYOR"
+            : game is not null ? "OYUN AÇIK"
+            : "BEKLEMEDE";
         OnPropertyChanged(nameof(SaveHotkey));
         OnPropertyChanged(nameof(RecordHotkey));
         OnPropertyChanged(nameof(ScreenshotHotkey));
@@ -127,6 +152,20 @@ public sealed partial class HomeViewModel : ObservableObject, IDisposable
         if (_tick % 5 == 0)
         {
             UpdateStats();
+        }
+    }
+
+    private async Task LoadHeroAsync(Hindsight.Core.Games.GameEntry? game)
+    {
+        if (game is null)
+        {
+            return;
+        }
+
+        var path = game.CoverImage ?? await SteamArt.GetCoverAsync(game.Id) ?? IconExtractor.GetCachedIcon(game.Id, game.IconSource ?? game.ExecutablePath);
+        if (path is not null && await ImageCache.LoadAsync(path, 640) is { } image && _heroGameId == game.Id)
+        {
+            HeroImage = image;
         }
     }
 

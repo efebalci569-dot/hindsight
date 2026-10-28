@@ -8,54 +8,75 @@
         <c:VisibleWhen x:Key="Visible" />
 
         <DataTemplate DataType="{x:Type vm:HeaderRow}">
-            <StackPanel Orientation="Horizontal" Margin="4,22,0,12">
-                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitle}" FontSize="17" />
-                <Border Background="{StaticResource Surface2Brush}" CornerRadius="9" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Subtitle}" FontSize="11.5" Foreground="{StaticResource MutedBrush}" />
+            <StackPanel Orientation="Horizontal" Margin="4,24,0,14">
+                <Border Width="28" Height="28" CornerRadius="8" Background="{Binding BadgeBrush}">
+                    <TextBlock Text="{Binding Badge}" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="12" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitle}" FontSize="17.5" Margin="11,0,0,0" VerticalAlignment="Center" />
+                <Border Background="#14FFFFFF" CornerRadius="9" Padding="9,2" Margin="10,1,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Subtitle}" FontSize="11.5" FontWeight="Medium" Foreground="{StaticResource MutedBrush}" />
                 </Border>
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="GameCard" DataType="{x:Type vm:GameCardViewModel}">
-            <Button Width="164" Margin="0,0,16,18" Padding="0" Background="Transparent" BorderThickness="0" VerticalContentAlignment="Top"
-                    HorizontalContentAlignment="Stretch" Cursor="Hand"
+            <Button Width="168" Height="246" Margin="0,0,16,18" Padding="0" Cursor="Hand"
                     Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                <StackPanel>
-                    <Grid Height="232">
-                        <Border CornerRadius="12" Background="{Binding Background}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <Image Source="{Binding Icon}" Width="56" Height="56" RenderOptions.BitmapScalingMode="HighQuality"
-                                       Visibility="{Binding Icon, Converter={StaticResource Visible}}" />
-                                <TextBlock Text="{Binding Initials}" FontSize="34" FontWeight="Bold" Foreground="#CCFFFFFF" HorizontalAlignment="Center"
-                                           Visibility="{Binding Icon, Converter={StaticResource Visible}, ConverterParameter=invert}" />
-                                <TextBlock Text="{Binding Name}" FontSize="12" Foreground="#99FFFFFF" TextAlignment="Center" TextWrapping="Wrap"
-                                           MaxWidth="130" Margin="0,10,0,0" MaxHeight="34" TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
-                        </Border>
-                        <Border CornerRadius="12" Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
-                            <Border.Background>
-                                <ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill" />
-                            </Border.Background>
-                        </Border>
-                        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8">
-                            <Border Background="#E6FF4D5E" CornerRadius="6" Padding="7,2" Visibility="{Binding IsRunning, Converter={StaticResource Visible}}">
-                                <TextBlock Text="● Oynanıyor" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="Card" RenderTransformOrigin="0.5,0.5">
+                            <!-- Fallback art: gradient + icon / initials -->
+                            <Border CornerRadius="16" Background="{Binding Background}">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,40">
+                                    <Image Source="{Binding Icon}" Width="58" Height="58" RenderOptions.BitmapScalingMode="HighQuality"
+                                           Visibility="{Binding Icon, Converter={StaticResource Visible}}" />
+                                    <TextBlock Text="{Binding Initials}" FontFamily="{StaticResource DisplayFont}" FontSize="38" FontWeight="Bold" Foreground="#D9FFFFFF"
+                                               HorizontalAlignment="Center" Visibility="{Binding Icon, Converter={StaticResource Visible}, ConverterParameter=invert}" />
+                                </StackPanel>
                             </Border>
-                            <Border Background="#E61B1B26" CornerRadius="6" Padding="7,2" Margin="0,4,0,0" Visibility="{Binding IsExcluded, Converter={StaticResource Visible}}">
-                                <TextBlock Text="Kaydedilmiyor" FontSize="11" Foreground="{StaticResource MutedBrush}" />
+                            <Border CornerRadius="16" Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill" />
+                                </Border.Background>
                             </Border>
-                        </StackPanel>
-                        <Border Background="#CC0B0B10" CornerRadius="6" Padding="7,2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8"
-                                Visibility="{Binding ClipCount, Converter={StaticResource Visible}}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="10" Margin="0,0,5,0" />
-                                <TextBlock Text="{Binding ClipCount}" FontSize="11.5" FontWeight="SemiBold" />
+                            <Border CornerRadius="16" Background="{StaticResource ShadeGradient}" />
+                            <Border x:Name="Edge" CornerRadius="16" BorderBrush="#24FFFFFF" BorderThickness="1" />
+
+                            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="9">
+                                <Border Background="#F0FF4D5E" CornerRadius="7" Padding="7,2" Visibility="{Binding IsRunning, Converter={StaticResource Visible}}">
+                                    <TextBlock Text="● Oynanıyor" FontSize="10.5" FontWeight="SemiBold" Foreground="White" />
+                                </Border>
+                                <Border Background="#E608080C" CornerRadius="7" Padding="7,2" Margin="0,4,0,0" Visibility="{Binding IsExcluded, Converter={StaticResource Visible}}">
+                                    <TextBlock Text="Kaydedilmiyor" FontSize="10.5" FontWeight="Medium" Foreground="{StaticResource MutedBrush}" />
+                                </Border>
                             </StackPanel>
-                        </Border>
-                    </Grid>
-                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" Margin="2,9,0,0" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Caption}" Margin="2,2,0,0" TextTrimming="CharacterEllipsis" />
-                </StackPanel>
+                            <Border Background="#CC08080C" CornerRadius="7" Padding="7,2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="9"
+                                    Visibility="{Binding ClipCount, Converter={StaticResource Visible}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="10" Margin="0,0,5,0" />
+                                    <TextBlock Text="{Binding ClipCount}" FontSize="11" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Border>
+                            <StackPanel VerticalAlignment="Bottom" Margin="12,0,12,12">
+                                <TextBlock Text="{Binding Name}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" FontSize="14" Foreground="White"
+                                           TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding Subtitle}" FontSize="11.5" Foreground="#B8FFFFFF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Edge" Property="BorderBrush" Value="#B3FF6A5A" />
+                                <Setter TargetName="Edge" Property="BorderThickness" Value="1.5" />
+                                <Setter TargetName="Card" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.03" ScaleY="1.03" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
             </Button>
         </DataTemplate>
 
@@ -76,24 +97,24 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <DockPanel Margin="30,26,14,0">
+        <DockPanel Margin="30,28,12,0">
             <!-- Header -->
-            <Grid DockPanel.Dock="Top" Margin="4,0,16,6">
+            <Grid DockPanel.Dock="Top" Margin="4,0,18,4">
                 <StackPanel>
                     <TextBlock Text="Oyunlar" Style="{StaticResource PageTitle}" />
                     <TextBlock Text="{Binding Summary}" Style="{StaticResource Muted}" Margin="0,4,0,0" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Grid Width="220">
-                        <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Padding="32,7,10,7" />
+                    <Grid Width="230">
+                        <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Padding="34,8,10,8" />
                         <TextBlock Text="&#xE721;" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource DimBrush}" HorizontalAlignment="Left"
-                                   Margin="11,0,0,0" IsHitTestVisible="False" />
+                                   Margin="12,0,0,0" IsHitTestVisible="False" />
                     </Grid>
-                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center" ToolTip="Gizlenen oyunları da göster">
+                    <StackPanel Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center" ToolTip="Gizlenen oyunları da göster">
                         <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowHidden}" />
                         <TextBlock Text="Gizliler" Foreground="{StaticResource MutedBrush}" FontSize="12.5" VerticalAlignment="Center" Margin="8,0,0,0" />
                     </StackPanel>
-                    <Button Margin="12,0,0,0" Command="{Binding RescanCommand}" ToolTip="Steam, Epic, GOG, Ubisoft, EA, Battle.net, Riot, Rockstar ve Xbox kütüphanelerini tara">
+                    <Button Margin="14,0,0,0" Command="{Binding RescanCommand}" ToolTip="Steam, Epic, GOG, Ubisoft, EA, Battle.net, Riot, Rockstar ve Xbox kütüphanelerini tara">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE72C;" Style="{StaticResource Icon}" FontSize="13" Margin="0,0,8,0" />
                             <TextBlock>
@@ -120,111 +141,154 @@
             </Grid>
 
             <!-- Empty state -->
-            <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="4,20,16,0" Padding="30"
+            <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="4,22,18,0" Padding="32"
                     Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}">
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="&#xE7FC;" Style="{StaticResource Icon}" FontSize="30" Foreground="{StaticResource DimBrush}" />
-                    <TextBlock Text="Henüz oyun bulunamadı" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,10,0,0" />
-                    <TextBlock Style="{StaticResource Muted}" TextAlignment="Center" Margin="0,6,0,0" MaxWidth="460"
+                    <Border Style="{StaticResource IconTile}" Width="54" Height="54" CornerRadius="16">
+                        <TextBlock Text="&#xE7FC;" Style="{StaticResource Icon}" FontSize="22" Foreground="#FF8A70" />
+                    </Border>
+                    <TextBlock Text="Henüz oyun bulunamadı" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,14,0,0" />
+                    <TextBlock Style="{StaticResource Muted}" TextAlignment="Center" Margin="0,6,0,0" MaxWidth="480"
                                Text="Hindsight Steam, Epic Games, GOG, Ubisoft Connect, EA app, Battle.net, Riot, Rockstar ve Xbox oyunlarını bulur. Listede olmayan bir oyunu tam ekran oynadığında da kendiliğinden ekler." />
                 </StackPanel>
             </Border>
 
-            <ItemsControl x:Name="List" Style="{StaticResource PlainList}" ItemsSource="{Binding Rows}" Padding="0,0,0,24" SizeChanged="OnListSizeChanged" />
+            <ItemsControl Style="{StaticResource PlainList}" ItemsSource="{Binding Rows}" Padding="0,0,0,24" SizeChanged="OnListSizeChanged" />
         </DockPanel>
 
         <!-- Detail panel -->
-        <Border Grid.Column="1" Width="330" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,0,0,0"
+        <Border Grid.Column="1" Width="344" Margin="0,12,12,12" Style="{StaticResource Card}" Padding="0"
                 Visibility="{Binding HasSelection, Converter={StaticResource Visible}}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="22,20,22,24" DataContext="{Binding Selected}">
-                    <Grid>
-                        <TextBlock Text="{Binding SourceName}" Style="{StaticResource Caption}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <Button Style="{StaticResource IconButton}" Content="&#xE8BB;" FontSize="11" HorizontalAlignment="Right"
-                                Command="{Binding DataContext.CloseDetailCommand, ElementName=Root}" ToolTip="Kapat" />
-                    </Grid>
-                    <Grid Height="190" Margin="0,10,0,0">
-                        <Border CornerRadius="14" Background="{Binding Background}">
-                            <Grid>
-                                <Image Source="{Binding Icon}" Width="72" Height="72" Visibility="{Binding Icon, Converter={StaticResource Visible}}" />
-                                <TextBlock Text="{Binding Initials}" FontSize="48" FontWeight="Bold" Foreground="#CCFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                           Visibility="{Binding Icon, Converter={StaticResource Visible}, ConverterParameter=invert}" />
-                            </Grid>
-                        </Border>
-                        <Border CornerRadius="14" Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                <StackPanel DataContext="{Binding Selected}">
+                    <!-- Blurred cover behind a crisp one -->
+                    <Grid Height="250" c:RoundedClip.Radius="15">
+                        <Border Background="{Binding Background}" />
+                        <Image Source="{Binding Cover}" Stretch="UniformToFill" Margin="-30" Opacity="0.6" CacheMode="BitmapCache"
+                               Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                            <Image.Effect>
+                                <BlurEffect Radius="30" RenderingBias="Performance" />
+                            </Image.Effect>
+                        </Image>
+                        <Border>
                             <Border.Background>
-                                <ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill" />
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#33121219" Offset="0" />
+                                    <GradientStop Color="#FF121219" Offset="1" />
+                                </LinearGradientBrush>
                             </Border.Background>
                         </Border>
+                        <Border Width="120" Height="170" CornerRadius="12" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20,0,0,18"
+                                Background="{Binding Background}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.6" Color="Black" />
+                            </Border.Effect>
+                            <Grid>
+                                <Image Source="{Binding Icon}" Width="56" Height="56" Visibility="{Binding Icon, Converter={StaticResource Visible}}" />
+                                <TextBlock Text="{Binding Initials}" FontFamily="{StaticResource DisplayFont}" FontSize="36" FontWeight="Bold" Foreground="#D9FFFFFF"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Visibility="{Binding Icon, Converter={StaticResource Visible}, ConverterParameter=invert}" />
+                                <Border CornerRadius="11" Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill" />
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <Button Style="{StaticResource IconButton}" Content="&#xE8BB;" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
+                                Background="#80000000" Foreground="White"
+                                Command="{Binding DataContext.CloseDetailCommand, ElementName=Root}" ToolTip="Kapat" />
                     </Grid>
-                    <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,14,0,0" />
 
-                    <UniformGrid Columns="3" Margin="0,14,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Klip" Style="{StaticResource Caption}" />
-                            <TextBlock Text="{Binding ClipCount}" FontSize="17" FontWeight="SemiBold" Margin="0,3,0,0" />
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBlock Text="Oynama" Style="{StaticResource Caption}" />
-                            <TextBlock FontSize="17" FontWeight="SemiBold" Margin="0,3,0,0">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding PlaytimeText}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding PlaytimeText}" Value="">
-                                                <Setter Property="Text" Value="—" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBlock Text="Son oynama" Style="{StaticResource Caption}" />
-                            <TextBlock Text="{Binding LastPlayedText}" FontSize="12.5" FontWeight="SemiBold" Margin="0,5,0,0" TextWrapping="Wrap" />
-                        </StackPanel>
-                    </UniformGrid>
-                    <TextBlock Text="Oynama süresi, Hindsight oyunu açık gördüğü süredir." Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap" />
+                    <StackPanel Margin="22,4,22,24">
+                        <Border Style="{StaticResource Pill}" Background="#18FFFFFF">
+                            <TextBlock Text="{Binding SourceName}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" />
+                        </Border>
+                        <TextBlock Text="{Binding Name}" Style="{StaticResource Display}" FontSize="22" TextWrapping="Wrap" Margin="0,10,0,0" />
 
-                    <Button Style="{StaticResource PrimaryButton}" Margin="0,18,0,0" Padding="14,10"
-                            Command="{Binding DataContext.LaunchCommand, ElementName=Root}"
-                            IsEnabled="{Binding DataContext.SelectedCanLaunch, ElementName=Root}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" FontSize="13" Foreground="White" Margin="0,0,8,0" />
-                            <TextBlock Text="Oyunu başlat" />
-                        </StackPanel>
-                    </Button>
-                    <UniformGrid Columns="2" Margin="0,8,0,0">
-                        <Button Content="Klipleri gör" Margin="0,0,4,0" Command="{Binding DataContext.ShowClipsCommand, ElementName=Root}" />
-                        <Button Content="Klasörü aç" Margin="4,0,0,0" Command="{Binding DataContext.OpenFolderCommand, ElementName=Root}" />
-                    </UniformGrid>
+                        <UniformGrid Columns="3" Margin="0,16,0,0">
+                            <Border Background="#0FFFFFFF" CornerRadius="12" Padding="12,10" Margin="0,0,6,0">
+                                <StackPanel>
+                                    <TextBlock Text="Klip" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{Binding ClipCount}" Style="{StaticResource Display}" FontSize="18" Margin="0,3,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#0FFFFFFF" CornerRadius="12" Padding="12,10" Margin="3,0,3,0">
+                                <StackPanel>
+                                    <TextBlock Text="Oynama" Style="{StaticResource Caption}" />
+                                    <TextBlock Margin="0,3,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Display}">
+                                                <Setter Property="FontSize" Value="15" />
+                                                <Setter Property="Text" Value="{Binding PlaytimeText}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PlaytimeText}" Value="">
+                                                        <Setter Property="Text" Value="—" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#0FFFFFFF" CornerRadius="12" Padding="12,10" Margin="6,0,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Son oynama" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{Binding LastPlayedText}" FontSize="11.5" FontWeight="SemiBold" Margin="0,5,0,0" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
 
-                    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="14" Margin="0,16,0,0">
-                        <Grid>
-                            <StackPanel Margin="0,0,56,0">
-                                <TextBlock Text="Bu oyunu kaydet" FontWeight="SemiBold" FontSize="13" />
-                                <TextBlock Text="Kapalıyken bu oyun açılınca arka plan kaydı başlamaz." Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                        <Button Style="{StaticResource PrimaryButton}" Margin="0,18,0,0" Padding="14,12" FontSize="14"
+                                Command="{Binding DataContext.LaunchCommand, ElementName=Root}"
+                                IsEnabled="{Binding DataContext.SelectedCanLaunch, ElementName=Root}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE768;" Style="{StaticResource Icon}" FontSize="13" Foreground="White" Margin="0,0,9,0" />
+                                <TextBlock Text="Oyunu başlat" />
                             </StackPanel>
-                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0" Background="Transparent" BorderThickness="0"
-                                    Command="{Binding DataContext.ToggleExcludedCommand, ElementName=Root}">
-                                <CheckBox Style="{StaticResource Switch}" IsHitTestVisible="False"
-                                          IsChecked="{Binding IsExcluded, Mode=OneWay, Converter={x:Static c:InvertBool.Instance}}" />
+                        </Button>
+                        <UniformGrid Columns="2" Margin="0,8,0,0">
+                            <Button Margin="0,0,4,0" Command="{Binding DataContext.ShowClipsCommand, ElementName=Root}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,7,0" />
+                                    <TextBlock Text="Klipler" />
+                                </StackPanel>
                             </Button>
-                        </Grid>
-                    </Border>
+                            <Button Margin="4,0,0,0" Command="{Binding DataContext.OpenFolderCommand, ElementName=Root}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,7,0" />
+                                    <TextBlock Text="Klasör" />
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
 
-                    <TextBlock Text="Konum" Style="{StaticResource Caption}" Margin="0,16,0,0" />
-                    <TextBlock Text="{Binding DataContext.SelectedPath, ElementName=Root}" FontSize="12" Foreground="{StaticResource MutedBrush}"
-                               TextWrapping="Wrap" Margin="0,3,0,0" />
+                        <Border Background="#0FFFFFFF" CornerRadius="14" Padding="14" Margin="0,16,0,0">
+                            <Grid>
+                                <StackPanel Margin="0,0,58,0">
+                                    <TextBlock Text="Bu oyunu kaydet" FontWeight="SemiBold" FontSize="13" />
+                                    <TextBlock Text="Kapalıyken bu oyun açılınca arka plan kaydı başlamaz." Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0" Background="Transparent" BorderThickness="0"
+                                        Command="{Binding DataContext.ToggleExcludedCommand, ElementName=Root}">
+                                    <CheckBox Style="{StaticResource Switch}" IsHitTestVisible="False"
+                                              IsChecked="{Binding IsExcluded, Mode=OneWay, Converter={x:Static c:InvertBool.Instance}}" />
+                                </Button>
+                            </Grid>
+                        </Border>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                        <Button Style="{StaticResource GhostButton}" Content="Yeniden adlandır" Padding="8,6" Command="{Binding DataContext.RenameCommand, ElementName=Root}" />
-                        <Button Style="{StaticResource GhostButton}" Content="{Binding DataContext.SelectedHiddenLabel, ElementName=Root}" Padding="8,6"
-                                Command="{Binding DataContext.ToggleHiddenCommand, ElementName=Root}" />
+                        <TextBlock Text="KONUM" Style="{StaticResource Overline}" Margin="0,18,0,0" />
+                        <TextBlock Text="{Binding DataContext.SelectedPath, ElementName=Root}" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                   TextWrapping="Wrap" Margin="0,4,0,0" />
+
+                        <WrapPanel Margin="-8,14,0,0">
+                            <Button Style="{StaticResource GhostButton}" Content="Yeniden adlandır" Padding="8,6" Command="{Binding DataContext.RenameCommand, ElementName=Root}" />
+                            <Button Style="{StaticResource GhostButton}" Content="{Binding DataContext.SelectedHiddenLabel, ElementName=Root}" Padding="8,6"
+                                    Command="{Binding DataContext.ToggleHiddenCommand, ElementName=Root}" />
+                            <Button Style="{StaticResource GhostButton}" Content="Listeden kaldır" Padding="8,6" Foreground="{StaticResource ErrorBrush}"
+                                    Command="{Binding DataContext.RemoveCommand, ElementName=Root}"
+                                    Visibility="{Binding DataContext.SelectedCanRemove, ElementName=Root, Converter={StaticResource Visible}}" />
+                        </WrapPanel>
                     </StackPanel>
-                    <Button Style="{StaticResource GhostButton}" Content="Listeden kaldır" Padding="8,6" HorizontalAlignment="Left" Foreground="{StaticResource ErrorBrush}"
-                            Command="{Binding DataContext.RemoveCommand, ElementName=Root}"
-                            Visibility="{Binding DataContext.SelectedCanRemove, ElementName=Root, Converter={StaticResource Visible}}" />
                 </StackPanel>
             </ScrollViewer>
         </Border>

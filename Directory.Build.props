@@ -1,7 +1,7 @@
 <Project>
   <!-- Shared settings for every .NET project in the Hindsight repository. -->
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Product>Hindsight</Product>
     <Company>Hindsight contributors</Company>
     <Copyright>© 2026 Hindsight contributors</Copyright>

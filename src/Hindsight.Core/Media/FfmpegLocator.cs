@@ -5,6 +5,12 @@ public static class FfmpegLocator
 {
     public static string? Find()
     {
+        // Tests and diagnostics can point at a specific build.
+        if (Environment.GetEnvironmentVariable("HINDSIGHT_FFMPEG") is { Length: > 0 } forced && File.Exists(forced))
+        {
+            return forced;
+        }
+
         var candidates = new List<string>
         {
             Path.Combine(AppPaths.AppDirectory, "ffmpeg", "ffmpeg.exe"),

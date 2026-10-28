@@ -30,13 +30,37 @@ public static class FfmpegArgs
 
             if (caps.HasDdaGrab && !request.Source.IsWindow)
             {
-                // Desktop Duplication cannot scale on the GPU in current builds, so scaling happens on the CPU.
-                var filter = $"hwdownload,format=bgra,scale={request.Width}:{request.Height}:flags=fast_bilinear,format={SoftwarePixelFormat(encoder)}";
-                variants.Add(new PipelineVariant(encoder, false, filter, "ddagrab+cpu-scale"));
+                variants.Add(DdaGrab(request, encoder));
+            }
+        }
+
+        // Some games cannot be captured as a window (exclusive full screen, protected surfaces):
+        // record the monitor the window is on rather than nothing at all.
+        if (request.Source.IsWindow && request.Source.MonitorHandle != 0)
+        {
+            foreach (var encoder in request.Encoders.Take(2))
+            {
+                if (caps.HasGfxCapture)
+                {
+                    var (filter, label) = GpuFrameFilters(encoder).First();
+                    variants.Add(new PipelineVariant(encoder, true, filter, label + "+monitor", MonitorFallback: true));
+                }
+
+                if (caps.HasDdaGrab)
+                {
+                    variants.Add(DdaGrab(request, encoder) with { MonitorFallback = true });
+                }
             }
         }
 
         return variants;
+    }
+
+    /// <summary>Desktop Duplication cannot scale on the GPU in current builds, so scaling happens on the CPU.</summary>
+    private static PipelineVariant DdaGrab(RecordingRequest request, EncoderInfo encoder)
+    {
+        var filter = $"hwdownload,format=bgra,scale={request.Width}:{request.Height}:flags=fast_bilinear,format={SoftwarePixelFormat(encoder)}";
+        return new PipelineVariant(encoder, false, filter, "ddagrab+cpu-scale");
     }
 
     private static IEnumerable<(string? Filter, string Label)> GpuFrameFilters(EncoderInfo encoder)
@@ -61,7 +85,7 @@ public static class FfmpegArgs
     private static string SoftwarePixelFormat(EncoderInfo encoder) =>
         encoder.Vendor is EncoderVendor.X264 or EncoderVendor.OpenH264 ? "yuv420p" : "nv12";
 
-    public static string CaptureFilter(RecordingRequest request, bool gfxCapture)
+    public static string CaptureFilter(RecordingRequest request, bool gfxCapture, bool monitorFallback = false)
     {
         var inv = CultureInfo.InvariantCulture;
         if (!gfxCapture)
@@ -69,7 +93,7 @@ public static class FfmpegArgs
             return string.Format(inv, "ddagrab=output_idx=0:framerate={0}:draw_mouse={1}", request.Fps, request.CaptureCursor ? 1 : 0);
         }
 
-        var target = request.Source.IsWindow
+        var target = request.Source.IsWindow && !monitorFallback
             ? string.Format(inv, "hwnd={0}:capture_border=0", (ulong)request.Source.WindowHandle)
             : request.Source.MonitorHandle != 0
                 ? string.Format(inv, "hmonitor={0}", (ulong)request.Source.MonitorHandle)
@@ -116,13 +140,14 @@ public static class FfmpegArgs
         return args;
     }
 
-    public static IReadOnlyList<string> Replay(RecordingRequest request, PipelineVariant variant, string sessionDirectory, string? audioPipe)
+    /// <param name="captureOverride">Tests only: a lavfi source (e.g. testsrc2) in place of the screen.</param>
+    public static IReadOnlyList<string> Replay(RecordingRequest request, PipelineVariant variant, string sessionDirectory, string? audioPipe, string? captureOverride = null)
     {
         var inv = CultureInfo.InvariantCulture;
         // No -nostdin here: the recorder stops ffmpeg cleanly by writing 'q' to its stdin.
         var args = new List<string> { "-hide_banner", "-loglevel", "warning", "-y" };
 
-        args.AddRange(["-f", "lavfi", "-i", CaptureFilter(request, variant.UseGfxCapture)]);
+        args.AddRange(["-f", "lavfi", "-i", captureOverride ?? CaptureFilter(request, variant.UseGfxCapture, variant.MonitorFallback)]);
         if (audioPipe is not null)
         {
             if (request.Audio.OffsetMs != 0)
@@ -130,7 +155,8 @@ public static class FfmpegArgs
                 args.AddRange(["-itsoffset", (request.Audio.OffsetMs / 1000.0).ToString("0.000", inv)]);
             }
 
-            args.AddRange(["-thread_queue_size", "4096", "-f", "f32le", "-ar", "48000", "-ac", "2", "-i", audioPipe]);
+            // Keep input options to the long-standing ones: newer FFmpeg builds reject -thread_queue_size on inputs.
+            args.AddRange(["-f", "f32le", "-ar", "48000", "-ac", "2", "-i", audioPipe]);
         }
 
         args.AddRange(["-map", "0:v:0"]);
