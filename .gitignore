@@ -12,3 +12,6 @@ ffmpeg/
 
 # Local tool config
 .claude/
+
+# Vercel CLI local files
+.env*.local
