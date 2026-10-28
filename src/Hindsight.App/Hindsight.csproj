@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- Only for the tray icon (System.Windows.Forms.NotifyIcon). -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>Hindsight</AssemblyName>
+    <RootNamespace>Hindsight.App</RootNamespace>
+    <ApplicationIcon>Resources\hindsight.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>Hindsight</AssemblyTitle>
+    <Description>Hindsight — background game clips</Description>
+    <!-- Low-memory runtime: workstation GC without the background GC thread, compact more aggressively. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+    <!-- CommunityToolkit.Mvvm's [ObservableProperty] on partial properties. -->
+    <LangVersion>preview</LangVersion>
+    <!-- WPF declares per-monitor DPI awareness in app.manifest; the WinForms analyzer only knows its own API. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms is only here for the tray icon; keep WPF names unambiguous. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.GC.ConserveMemory" Value="7" />
+    <RuntimeHostConfigurationOption Include="System.GC.RetainVM" Value="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hindsight.Core\Hindsight.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\hindsight.ico" />
+    <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+
+  <!-- Bundled ffmpeg (scripts/fetch-ffmpeg.ps1 puts it in <repo>\ffmpeg). Without it the app looks on PATH / C:\ffmpeg\bin. -->
+  <ItemGroup Condition="Exists('$(MSBuildThisFileDirectory)..\..\ffmpeg\ffmpeg.exe')">
+    <None Include="$(MSBuildThisFileDirectory)..\..\ffmpeg\*.*" Link="ffmpeg\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+</Project>

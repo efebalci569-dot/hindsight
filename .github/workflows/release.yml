@@ -1,0 +1,104 @@
+name: Release
+
+# Builds the Windows release (installer + portable zip + SHA256SUMS) and publishes it as a
+# GitHub Release when a tag like v0.1.0 is pushed. The website's download buttons point at
+# the "latest" release assets, so a new tag updates the site automatically.
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build, e.g. v0.1.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Version from tag
+        shell: pwsh
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Tag must look like v1.2.3 (got $env:TAG)" }
+          "VERSION=$version" | Out-File $env:GITHUB_ENV -Append
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Unit tests
+        run: dotnet test Hindsight.sln -c Release
+
+      - name: Fetch FFmpeg (BtbN win64 gpl-shared)
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./scripts/fetch-ffmpeg.ps1 -Tag latest
+
+      - name: Publish self-contained app
+        shell: pwsh
+        run: ./scripts/publish.ps1 -Version $env:VERSION
+
+      - name: Smoke test (the app starts and stays up)
+        shell: pwsh
+        run: |
+          $data = Join-Path $env:RUNNER_TEMP 'hindsight-smoke'
+          $p = Start-Process artifacts/publish/win-x64/Hindsight.exe -ArgumentList '--data-dir', $data, '--minimized' -PassThru
+          Start-Sleep -Seconds 20
+          if ($p.HasExited) { throw "Hindsight.exe exited during startup (code $($p.ExitCode))" }
+          Get-Content (Join-Path $data 'local/logs/hindsight.log') -ErrorAction SilentlyContinue
+          Stop-Process -Id $p.Id -Force
+
+      - name: Portable zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/release | Out-Null
+          Compress-Archive -Path artifacts/publish/win-x64/* -DestinationPath "artifacts/release/Hindsight-$env:VERSION-win-x64.zip" -CompressionLevel Optimal
+
+      - name: Installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          & $iscc "/DAppVersion=$env:VERSION" "/DSourceDir=..\artifacts\publish\win-x64" "/DOutputDir=..\artifacts\release" installer\Hindsight.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+          # Stable names for the website's "latest" download links.
+          Copy-Item "artifacts/release/HindsightSetup-$env:VERSION.exe" artifacts/release/HindsightSetup.exe
+          Copy-Item "artifacts/release/Hindsight-$env:VERSION-win-x64.zip" artifacts/release/Hindsight-win-x64.zip
+
+      - name: Checksums
+        shell: pwsh
+        run: |
+          Set-Location artifacts/release
+          Get-ChildItem -File | Where-Object Name -ne 'SHA256SUMS.txt' | ForEach-Object {
+            "$((Get-FileHash $_.Name -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content SHA256SUMS.txt -Encoding ascii
+          Get-Content SHA256SUMS.txt
+          Get-ChildItem -File | Select-Object Name, @{n='MB';e={[math]::Round($_.Length / 1MB, 1)}} | Format-Table | Out-String | Write-Host
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = "docs/releases/$env:VERSION.md"
+          if (-not (Test-Path $notes)) { $notes = $null }
+          $files = Get-ChildItem artifacts/release -File | ForEach-Object FullName
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $env:TAG @files --clobber
+          } elseif ($notes) {
+            gh release create $env:TAG @files --title "Hindsight $env:VERSION" --notes-file $notes
+          } else {
+            gh release create $env:TAG @files --title "Hindsight $env:VERSION" --generate-notes
+          }

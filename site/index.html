@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hindsight — Oyundaki en iyi anı kaçırma</title>
+  <meta name="description" content="Hindsight arka planda sessizce kaydeder; tek tuşla son anları klip olarak kaydedersin. Windows için ücretsiz, açık kaynak, hafif oyun klip uygulaması." />
+  <meta name="theme-color" content="#0B0B10" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Hindsight — Oyundaki en iyi anı kaçırma" />
+  <meta property="og:description" content="Arka planda sessizce kaydeder, tek tuşla klip. Windows için ücretsiz ve açık kaynak." />
+  <meta property="og:image" content="/assets/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/site.css" />
+</head>
+<body>
+  <header class="nav" id="top">
+    <div class="wrap nav-row">
+      <a class="brand" href="#top"><img src="/assets/favicon.svg" alt="" width="28" height="28" /><span>Hindsight</span></a>
+      <nav class="links">
+        <a href="#how" data-i18n="nav.how">Nasıl çalışır</a>
+        <a href="#features" data-i18n="nav.features">Özellikler</a>
+        <a href="#performance" data-i18n="nav.performance">Performans</a>
+        <a href="#faq" data-i18n="nav.faq">SSS</a>
+        <a href="https://github.com/efebalci569-dot/hindsight" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="lang" id="lang" type="button" aria-label="Language">EN</button>
+        <a class="btn btn-primary btn-sm" href="#download" data-i18n="nav.download">İndir</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="rec-dot"></span><span data-i18n="hero.eyebrow">Windows için anlık tekrar</span></p>
+          <h1 data-i18n="hero.title">Oyundaki en iyi anı <em>kaçırma.</em></h1>
+          <p class="lead" data-i18n="hero.lead">Hindsight oyun açıkken son anları arka planda sessizce tutar. Muhteşem bir şey olduğunda tek tuşa bas — son 30 saniye klibin olsun. Oyun oyun ayrılmış, Discord'a hazır.</p>
+          <div class="cta">
+            <a class="btn btn-primary btn-lg" id="download-hero" href="https://github.com/efebalci569-dot/hindsight/releases/latest/download/HindsightSetup.exe">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7H3v5.9Zm8.4 1.2L21 21v-8.4h-9.6v7.1Zm0-15.4v7.2H21V3l-9.6 1.3Z"/></svg>
+              <span data-i18n="hero.cta">Windows için indir</span>
+            </a>
+            <a class="btn btn-ghost btn-lg" href="https://github.com/efebalci569-dot/hindsight" target="_blank" rel="noopener" data-i18n="hero.github">Kaynak kodu</a>
+          </div>
+          <p class="meta"><span class="version" data-version>v0.1.0</span> · <span data-i18n="hero.meta">Ücretsiz · Açık kaynak · Windows 10 / 11</span></p>
+        </div>
+
+        <!-- Ring buffer visual: the last N seconds keep rolling; Alt+F8 turns them into a clip -->
+        <div class="hero-visual" aria-hidden="true">
+          <div class="ring-stage">
+            <svg class="ring" viewBox="0 0 320 320" id="ring"></svg>
+            <div class="ring-center">
+              <div class="ring-label" data-i18n="ring.label">son anlar</div>
+              <div class="ring-time"><span id="ring-seconds">30</span><small> sn</small></div>
+              <div class="ring-sub" data-i18n="ring.sub">diskte döner · RAM'de büyümez</div>
+            </div>
+          </div>
+          <div class="keys" id="keys"><kbd>Alt</kbd><span>+</span><kbd>F8</kbd></div>
+          <div class="toast" id="toast">
+            <div class="toast-icon">✓</div>
+            <div>
+              <div class="toast-title" data-i18n="toast.title">Klip kaydedildi</div>
+              <div class="toast-text"><span id="toast-game">Neon Drift</span> · 30 sn</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wrap launchers">
+        <span data-i18n="launchers.label">Kütüphaneni bulur:</span>
+        <span class="chip">Steam</span><span class="chip">Epic Games</span><span class="chip">GOG</span><span class="chip">Ubisoft Connect</span>
+        <span class="chip">EA app</span><span class="chip">Battle.net</span><span class="chip">Riot Games</span><span class="chip">Rockstar</span><span class="chip">Xbox</span>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" id="how">
+      <div class="wrap">
+        <h2 data-i18n="how.title">Üç adım. Gerisini o halleder.</h2>
+        <div class="steps">
+          <article class="step">
+            <div class="step-num">1</div>
+            <h3 data-i18n="how.s1.t">Oyununu aç</h3>
+            <p data-i18n="how.s1.d">Hindsight oyunu tanır ve arka plan kaydını kendiliğinden başlatır. Listede olmayan tam ekran oyunları da algılar. Oyun kapanınca kayıt durur.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">2</div>
+            <h3 data-i18n="how.s2.t">Kısayola bas</h3>
+            <p data-i18n="how.s2.d"><kbd>Alt</kbd> + <kbd>F8</kbd> — az önce olan her şey klip olarak oyunun klasörüne kaydedilir. Oyundan çıkmana gerek yok; köşede küçük bir onay belirir.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">3</div>
+            <h3 data-i18n="how.s3.t">Paylaş</h3>
+            <p data-i18n="how.s3.d">Kırp, Discord için 10 MB'a küçült, GIF yap ya da dosyayı kopyalayıp sohbete yapıştır.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- App preview (drawn, not a screenshot) -->
+    <section class="section section-alt" id="features">
+      <div class="wrap">
+        <h2 data-i18n="features.title">Klipler oyun oyun, kütüphane platform platform.</h2>
+        <p class="section-lead" data-i18n="features.lead">Her oyunun kendi klasörü var: Videolar\Hindsight\Oyun Adı. Uygulamada da öyle — soldan oyunu seç, kliplerine bak.</p>
+
+        <div class="window">
+          <div class="win-bar"><img src="/assets/favicon.svg" alt="" width="16" height="16" /><span>Hindsight</span><i></i><i></i><i></i></div>
+          <div class="win-body">
+            <aside class="win-side">
+              <div class="side-item"><span>⌂</span><span data-i18n="mock.home">Ana sayfa</span></div>
+              <div class="side-item"><span>◈</span><span data-i18n="mock.games">Oyunlar</span></div>
+              <div class="side-item active"><span>▶</span><span data-i18n="mock.clips">Klipler</span></div>
+              <div class="side-item"><span>⚙</span><span data-i18n="mock.settings">Ayarlar</span></div>
+              <div class="side-status">
+                <div class="st-row"><span class="rec-dot"></span><b data-i18n="mock.buffer">Arka plan kaydı açık</b></div>
+                <div class="st-sub">Neon Drift · 30/30 sn</div>
+                <div class="st-bar"><i></i></div>
+                <div class="st-btn"><span data-i18n="mock.save">Klip kaydet</span> <kbd>Alt+F8</kbd></div>
+              </div>
+            </aside>
+            <div class="win-filter">
+              <div class="f-title" data-i18n="mock.byGame">OYUNA GÖRE</div>
+              <div class="f-item active"><span data-i18n="mock.all">Tüm klipler</span><b>24</b></div>
+              <div class="f-item"><span data-i18n="mock.fav">Favoriler</span><b>5</b></div>
+              <div class="f-item"><span>Neon Drift</span><b>11</b></div>
+              <div class="f-item"><span>Ironclad Tactics</span><b>8</b></div>
+              <div class="f-item"><span>Skyfall Arena</span><b>5</b></div>
+            </div>
+            <div class="win-main">
+              <div class="m-head"><b data-i18n="mock.all">Tüm klipler</b><span>24 video · 1,8 GB</span></div>
+              <div class="m-group">Neon Drift</div>
+              <div class="grid">
+                <div class="tile t1"><span class="dur">0:30</span><span class="star">★</span></div>
+                <div class="tile t2"><span class="dur">0:30</span></div>
+                <div class="tile t3"><span class="dur">2:14</span></div>
+              </div>
+              <div class="m-group">Ironclad Tactics</div>
+              <div class="grid">
+                <div class="tile t4"><span class="dur">0:45</span></div>
+                <div class="tile t5"><span class="dur">0:30</span><span class="star">★</span></div>
+                <div class="tile t6"><span class="dur">PNG</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="fineprint" data-i18n="features.note">Önizleme temsilidir; oyun adları uydurmadır.</p>
+
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon">⟲</div>
+            <h3 data-i18n="f1.t">Anlık tekrar</h3>
+            <p data-i18n="f1.d">Son 15 saniye ile 5 dakika arasını sen seç. Klip, kısayola bastığın ana kadar her şeyi içerir.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">◈</div>
+            <h3 data-i18n="f2.t">Oyun kütüphanesi</h3>
+            <p data-i18n="f2.d">Steam, Epic, GOG, Ubisoft, EA, Battle.net, Riot, Rockstar ve Xbox oyunları bölüm bölüm. Kapaklar, oynama süresi, klip sayısı, tek tıkla başlat.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">✂</div>
+            <h3 data-i18n="f3.t">Discord'a hazır</h3>
+            <p data-i18n="f3.d">Oynatıcıda kırp; 10 MB ya da 50 MB sınırına sığacak şekilde tek tıkla küçült; GIF yap; dosyayı kopyalayıp sohbete yapıştır.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">▣</div>
+            <h3 data-i18n="f4.t">Kalite senin elinde</h3>
+            <p data-i18n="f4.d">480p'den 1080p'ye, 30 ya da 60 FPS, H.264 / HEVC / AV1, kalite ya da özel bit hızı. Ayarlar ekranı kullanacağı RAM'i ve diski önceden gösterir.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">●</div>
+            <h3 data-i18n="f5.t">Kayıt ve ekran görüntüsü</h3>
+            <p data-i18n="f5.d">Süre sınırı olmayan manuel kayıt (<kbd>Alt+F7</kbd>) ve tam çözünürlükte ekran görüntüsü (<kbd>Alt+F12</kbd>). Kısayolların hepsi değiştirilebilir.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">♪</div>
+            <h3 data-i18n="f6.t">Oyun sesi + mikrofon</h3>
+            <p data-i18n="f6.d">Kulaklıkta ne duyuyorsan o. İstersen mikrofonun da, ayrı ses seviyesiyle. Çıkış cihazını değiştirirsen kayıt da geçer.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Performance -->
+    <section class="section" id="performance">
+      <div class="wrap">
+        <h2 data-i18n="perf.title">Oyunundan FPS çalmamak için tasarlandı.</h2>
+        <p class="section-lead" data-i18n="perf.lead">Görüntü baştan sona ekran kartında kalır. Son anlar RAM'de değil, diskte dönen küçük parçalarda tutulur.</p>
+
+        <div class="pipeline">
+          <div class="pipe"><b data-i18n="p1.t">Ekran</b><span data-i18n="p1.d">Windows Graphics Capture</span></div>
+          <div class="arrow">→</div>
+          <div class="pipe gpu"><b data-i18n="p2.t">GPU'da küçült</b><span>1080p · 720p · 480p</span></div>
+          <div class="arrow">→</div>
+          <div class="pipe gpu"><b data-i18n="p3.t">Donanım kodlayıcı</b><span>NVENC · AMF · Quick Sync</span></div>
+          <div class="arrow">→</div>
+          <div class="pipe"><b data-i18n="p4.t">2 sn'lik parçalar</b><span data-i18n="p4.d">diskte, halka halinde</span></div>
+          <div class="arrow">→</div>
+          <div class="pipe accent"><b>Alt + F8</b><span data-i18n="p5.d">0,1 sn'de MP4</span></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="stat-num">~20 <small>MB</small></div><div class="stat-label" data-i18n="s1">tepside beklerken RAM</div></div>
+          <div class="stat"><div class="stat-num">~130 <small>MB</small></div><div class="stat-label" data-i18n="s2">720p60 kayıt motoru</div></div>
+          <div class="stat"><div class="stat-num">~%5</div><div class="stat-label" data-i18n="s3">tek çekirdek CPU (720p60)</div></div>
+          <div class="stat"><div class="stat-num">0</div><div class="stat-label" data-i18n="s4">yeniden kodlama, klip kaydederken</div></div>
+        </div>
+        <p class="fineprint" data-i18n="perf.note">RTX 5070 ve 1920×1080 ekranda ölçüldü. 1080p60'ta kayıt motoru ~200 MB ve tek çekirdeğin ~%10'u. Ekran kartı kodlayıcısı olmayan bilgisayarlarda Windows Media Foundation ya da işlemci kullanılır; o zaman yük artar.</p>
+      </div>
+    </section>
+
+    <!-- Download -->
+    <section class="section section-alt" id="download">
+      <div class="wrap">
+        <div class="download">
+          <div>
+            <h2 data-i18n="dl.title">Hindsight'ı indir</h2>
+            <p class="section-lead" data-i18n="dl.lead">Ücretsiz, reklamsız, hesap gerektirmez. Hiçbir şey internete yüklenmez.</p>
+            <ul class="reqs">
+              <li data-i18n="dl.r1">Windows 10 (1903+) veya Windows 11, 64-bit</li>
+              <li data-i18n="dl.r2">Yönetici izni gerekmez</li>
+              <li data-i18n="dl.r3">NVIDIA, AMD veya Intel ekran kartı önerilir</li>
+            </ul>
+          </div>
+          <div class="dl-box">
+            <a class="btn btn-primary btn-lg btn-block" href="https://github.com/efebalci569-dot/hindsight/releases/latest/download/HindsightSetup.exe">
+              <span data-i18n="dl.installer">Kurulumu indir</span> <span class="dl-meta" data-size="setup"></span>
+            </a>
+            <a class="btn btn-ghost btn-block" href="https://github.com/efebalci569-dot/hindsight/releases/latest/download/Hindsight-win-x64.zip">
+              <span data-i18n="dl.portable">Taşınabilir (.zip)</span> <span class="dl-meta" data-size="zip"></span>
+            </a>
+            <div class="dl-links">
+              <span class="version" data-version>v0.1.0</span> ·
+              <a href="https://github.com/efebalci569-dot/hindsight/releases/latest" target="_blank" rel="noopener" data-i18n="dl.notes">Sürüm notları</a> ·
+              <a href="https://github.com/efebalci569-dot/hindsight/releases/latest/download/SHA256SUMS.txt" target="_blank" rel="noopener">SHA-256</a>
+            </div>
+            <p class="smartscreen" data-i18n="dl.smartscreen">Uygulama imzasız olduğu için Windows SmartScreen ilk açılışta uyarabilir: <b>Ek bilgi → Yine de çalıştır</b>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="wrap narrow">
+        <h2 data-i18n="faq.title">Sık sorulanlar</h2>
+        <details>
+          <summary data-i18n="q1">Oyunumun FPS'ini düşürür mü?</summary>
+          <p data-i18n="a1">Ekran kartındaki ayrı kodlama birimi (NVENC / AMF / Quick Sync) kullanıldığında etkisi genelde birkaç FPS'in altındadır, çünkü görüntü ekran kartından hiç çıkmaz. Yine de hiçbir kayıt aracı "sıfır" etki vaat edemez; zorlanırsan 720p veya 30 FPS'e geçebilir, kayıt önceliğini "Düşük" yapabilirsin.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">Klipler nereye kaydediliyor?</summary>
+          <p data-i18n="a2">Varsayılan olarak Videolar\Hindsight\&lt;Oyun adı&gt; klasörüne, ekran görüntüleri de onun içindeki "Ekran Görüntüleri" klasörüne. Klasörü ayarlardan değiştirebilirsin.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">Neden RAM'i az kullanıyor?</summary>
+          <p data-i18n="a3">Çoğu anlık tekrar aracı son anları sıkıştırılmış halde RAM'de tutar; süre uzadıkça bellek de büyür. Hindsight son anları diskte, üzerine yazılan 2 saniyelik dosyalarda tutar — 5 dakikalık klip ayarı da 15 saniyelik kadar RAM kullanır. Pencereyi kapatınca arayüz de bellekten tamamen kaldırılır.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">Hangi oyunları tanıyor?</summary>
+          <p data-i18n="a4">Steam, Epic Games, GOG, Ubisoft Connect, EA app, Battle.net, Riot Games, Rockstar ve Xbox / Microsoft Store kurulumlarını tarar. Listede olmayan bir oyunu tam ekran oynarsan onu da ekler; istersen bir oyunu elle de ekleyebilir ya da "bu oyunu kaydetme" diyebilirsin.</p>
+        </details>
+        <details>
+          <summary data-i18n="q5">Bir hesap ya da internet bağlantısı gerekiyor mu?</summary>
+          <p data-i18n="a5">Hayır. Hindsight hiçbir veriyi göndermez, telemetri yoktur. Tek ağ isteği: Steam'in yerelde kapak görseli tutmadığı oyunlar için Steam'in herkese açık mağaza görselini bir kez indirmek.</p>
+        </details>
+        <details>
+          <summary data-i18n="q6">Windows "bilinmeyen yayımcı" uyarısı veriyor.</summary>
+          <p data-i18n="a6">Hindsight kod imzalama sertifikası olmadan dağıtılıyor. Kaynak kodu GitHub'da açık; indirdiğin dosyayı sürüm sayfasındaki SHA-256 özetiyle karşılaştırabilirsin.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-row">
+      <div class="brand"><img src="/assets/favicon.svg" alt="" width="22" height="22" /><span>Hindsight</span></div>
+      <p data-i18n="footer.text">MIT lisanslı açık kaynak. Kayıt motoru FFmpeg (GPL v3) üzerinde çalışır. Oyun adları ve görselleri sahiplerine aittir.</p>
+      <a href="https://github.com/efebalci569-dot/hindsight" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+bin/
+obj/
+artifacts/
+.vs/
+*.user
+*.suo
+TestResults/
+node_modules/
+.vercel/
+# Local ffmpeg bundle fetched by scripts/fetch-ffmpeg.ps1
+ffmpeg/
+
+# Local tool config
+.claude/

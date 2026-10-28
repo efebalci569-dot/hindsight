@@ -1,0 +1,27 @@
+<Window x:Class="Hindsight.App.Views.ToastWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hindsight" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight" Focusable="False" Opacity="0">
+    <Border Margin="12" Background="#F21B1B26" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="14"
+            Padding="14,12,18,12" MinWidth="280" MaxWidth="380">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.55" Color="Black" />
+        </Border.Effect>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="IconCircle" Width="36" Height="36" CornerRadius="18" Background="{StaticResource AccentGradient}" VerticalAlignment="Center">
+                <TextBlock x:Name="IconGlyph" Text="&#xE73E;" Style="{StaticResource Icon}" Foreground="White" FontSize="15" />
+            </Border>
+            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                <TextBlock x:Name="TitleText" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" FontFamily="{StaticResource UiFont}" />
+                <TextBlock x:Name="MessageText" FontSize="12.5" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"
+                           FontFamily="{StaticResource UiFont}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

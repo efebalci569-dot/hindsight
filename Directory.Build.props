@@ -1,0 +1,15 @@
+<Project>
+  <!-- Shared settings for every .NET project in the Hindsight repository. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Product>Hindsight</Product>
+    <Company>Hindsight contributors</Company>
+    <Copyright>© 2026 Hindsight contributors</Copyright>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+    <SatelliteResourceLanguages>en;tr</SatelliteResourceLanguages>
+  </PropertyGroup>
+</Project>
